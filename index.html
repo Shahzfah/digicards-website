@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiCards - Smart Business Card Scanner</title>
+    <meta name="description" content="Scan, organize, and sync business cards instantly. AI-powered OCR extracts contact info in seconds. Free to start.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📇</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">📇</span>
+                <span class="logo-text">DigiCards</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it Works</a>
+                <a href="#pricing">Pricing</a>
+            </div>
+            <a href="#download" class="btn btn-primary btn-nav">Get the App</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="container hero-container">
+            <div class="hero-content">
+                <div class="badge">
+                    <span class="badge-dot"></span>
+                    AI-Powered Business Card Scanner
+                </div>
+                <h1>Never Lose a Contact Again</h1>
+                <p class="hero-subtitle">
+                    Snap a photo, and our AI instantly extracts names, emails, phone numbers, and more.
+                    Organize contacts by events, sync to your CRM, and build your network effortlessly.
+                </p>
+                <div class="hero-cta">
+                    <a href="#download" class="btn btn-primary btn-large">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                        Download for iOS
+                    </a>
+                    <a href="#download" class="btn btn-secondary btn-large">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.807 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
+                        </svg>
+                        Download for Android
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">50K+</span>
+                        <span class="stat-label">Cards Scanned</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-number">98%</span>
+                        <span class="stat-label">Accuracy Rate</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-number">4.8</span>
+                        <span class="stat-label">App Rating</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="app-header">
+                            <span>DigiCards</span>
+                        </div>
+                        <div class="card-preview">
+                            <div class="card-avatar">JD</div>
+                            <div class="card-info">
+                                <div class="card-name">John Doe</div>
+                                <div class="card-title">Product Manager</div>
+                                <div class="card-company">Tech Corp</div>
+                            </div>
+                        </div>
+                        <div class="card-preview">
+                            <div class="card-avatar" style="background: linear-gradient(135deg, #10b981, #059669);">SM</div>
+                            <div class="card-info">
+                                <div class="card-name">Sarah Miller</div>
+                                <div class="card-title">CEO</div>
+                                <div class="card-company">StartupXYZ</div>
+                            </div>
+                        </div>
+                        <div class="card-preview">
+                            <div class="card-avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">MK</div>
+                            <div class="card-info">
+                                <div class="card-name">Mike Kim</div>
+                                <div class="card-title">Developer</div>
+                                <div class="card-company">DevStudio</div>
+                            </div>
+                        </div>
+                        <div class="scan-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                <path d="M12 15.2l-3.2-3.2-1.4 1.4L12 18l8-8-1.4-1.4L12 15.2z"/>
+                                <path d="M4 4h4V2H4c-1.1 0-2 .9-2 2v4h2V4zm16 0v4h2V4c0-1.1-.9-2-2-2h-4v2h4zM4 20h4v2H4c-1.1 0-2-.9-2-2v-4h2v4zm16 0v-4h2v4c0 1.1-.9 2-2 2h-4v-2h4z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="floating-card card-1">
+                    <div class="mini-icon">📧</div>
+                    <span>Email extracted</span>
+                </div>
+                <div class="floating-card card-2">
+                    <div class="mini-icon">📱</div>
+                    <span>Phone detected</span>
+                </div>
+                <div class="floating-card card-3">
+                    <div class="mini-icon">🏢</div>
+                    <span>Company found</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section (Bento Grid) -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Features</span>
+                <h2>Everything you need to manage contacts</h2>
+                <p>Powerful tools designed for networking professionals</p>
+            </div>
+            <div class="bento-grid">
+                <div class="bento-card bento-large">
+                    <div class="bento-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M19 5h-6v6h6V5zm-6 8h1.5v1.5H13V13zm1.5 1.5H16V16h-1.5v-1.5zM16 13h1.5v1.5H16V13zm-3 3h1.5v1.5H13V16zm1.5 1.5H16V19h-1.5v-1.5zM16 16h1.5v1.5H16V16zm1.5-1.5H19V16h-1.5v-1.5zm0 3H19V19h-1.5v-1.5zM19 13h-1.5v1.5H19V13z"/>
+                        </svg>
+                    </div>
+                    <h3>AI-Powered OCR</h3>
+                    <p>Our advanced AI reads business cards in seconds with 98% accuracy. Names, emails, phone numbers, addresses, and social profiles are automatically extracted and organized.</p>
+                    <div class="bento-visual">
+                        <div class="scan-animation">
+                            <div class="scan-line"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bento-card">
+                    <div class="bento-icon icon-green">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                    </div>
+                    <h3>Smart Categories</h3>
+                    <p>Organize contacts by events, industries, or custom tags. Find anyone instantly.</p>
+                </div>
+                <div class="bento-card">
+                    <div class="bento-icon icon-purple">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+                        </svg>
+                    </div>
+                    <h3>Event Mode</h3>
+                    <p>Rapid-fire scanning at conferences. Capture dozens of cards in minutes.</p>
+                </div>
+                <div class="bento-card">
+                    <div class="bento-icon icon-orange">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                        </svg>
+                    </div>
+                    <h3>CRM Sync</h3>
+                    <p>One-tap sync to HubSpot or Google Contacts. Keep your CRM always up to date.</p>
+                </div>
+                <div class="bento-card bento-wide">
+                    <div class="bento-icon icon-blue">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                    </div>
+                    <h3>AI Search</h3>
+                    <p>Search naturally: "Find the marketing person I met at the tech conference in June." Our AI understands context and finds the right contact every time.</p>
+                </div>
+                <div class="bento-card">
+                    <div class="bento-icon icon-pink">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3>Reminders</h3>
+                    <p>Set follow-up reminders so you never forget to reach out.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">How It Works</span>
+                <h2>Three steps to digital networking</h2>
+                <p>From paper to digital in seconds</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 15.2l-3.2-3.2-1.4 1.4L12 18l8-8-1.4-1.4L12 15.2z"/>
+                            <path d="M4 4h4V2H4c-1.1 0-2 .9-2 2v4h2V4zm16 0v4h2V4c0-1.1-.9-2-2-2h-4v2h4zM4 20h4v2H4c-1.1 0-2-.9-2-2v-4h2v4zm16 0v-4h2v4c0 1.1-.9 2-2 2h-4v-2h4z"/>
+                        </svg>
+                    </div>
+                    <h3>Scan</h3>
+                    <p>Point your camera at any business card. Our AI handles the rest.</p>
+                </div>
+                <div class="step-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                    </svg>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                    </div>
+                    <h3>Review</h3>
+                    <p>Verify the extracted info. Add notes about where you met.</p>
+                </div>
+                <div class="step-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                    </svg>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                        </svg>
+                    </div>
+                    <h3>Sync</h3>
+                    <p>Save locally or sync to your favorite CRM with one tap.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Pricing</span>
+                <h2>Simple, transparent pricing</h2>
+                <p>Start free, upgrade when you need more</p>
+            </div>
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free</h3>
+                        <div class="price">
+                            <span class="price-amount">$0</span>
+                            <span class="price-period">/month</span>
+                        </div>
+                        <p>Perfect for getting started</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            10 card scans per day
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            1 category
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Basic search
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Cloud backup
+                        </li>
+                    </ul>
+                    <a href="#download" class="btn btn-secondary btn-block">Get Started Free</a>
+                </div>
+                <div class="pricing-card pricing-featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3>Premium</h3>
+                        <div class="price">
+                            <span class="price-amount">$9.99</span>
+                            <span class="price-period">/month</span>
+                        </div>
+                        <p>For serious networkers</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            <strong>Unlimited</strong> card scans
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            <strong>Unlimited</strong> categories
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            AI-powered search
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            CRM integrations
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Event bulk scanning
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Reminders & follow-ups
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Excel export
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#10b981">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Priority support
+                        </li>
+                    </ul>
+                    <a href="#download" class="btn btn-primary btn-block">Start Free Trial</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download CTA -->
+    <section id="download" class="download">
+        <div class="container">
+            <div class="download-content">
+                <h2>Ready to digitize your network?</h2>
+                <p>Join thousands of professionals who trust DigiCards</p>
+                <div class="download-buttons">
+                    <a href="#" class="store-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                        <div>
+                            <span class="store-label">Download on the</span>
+                            <span class="store-name">App Store</span>
+                        </div>
+                    </a>
+                    <a href="#" class="store-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.807 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
+                        </svg>
+                        <div>
+                            <span class="store-label">Get it on</span>
+                            <span class="store-name">Google Play</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <span class="logo-icon">📇</span>
+                        <span class="logo-text">DigiCards</span>
+                    </a>
+                    <p>Smart business card management for the modern professional.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="#features">Features</a>
+                        <a href="#pricing">Pricing</a>
+                        <a href="#download">Download</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <a href="#">About</a>
+                        <a href="#">Blog</a>
+                        <a href="#">Contact</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 DigiCards. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.bento-card, .step, .pricing-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
