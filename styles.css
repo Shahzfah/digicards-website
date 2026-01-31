@@ -171,7 +171,9 @@ a {
 }
 
 .logo-icon {
-    font-size: 1.75rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
 }
 
 .nav-links {
