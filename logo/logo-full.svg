@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80">
+  <defs>
+    <linearGradient id="symbolGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Symbol -->
+  <g transform="translate(40,40)">
+    <!-- Card outline -->
+    <rect x="-28" y="-18" width="56" height="36" rx="5" fill="none" stroke="url(#symbolGrad)" stroke-width="4" transform="rotate(-8)"/>
+
+    <!-- Scan lines -->
+    <line x1="-15" y1="28" x2="22" y2="-8" stroke="url(#symbolGrad)" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <line x1="-5" y1="33" x2="32" y2="-3" stroke="url(#symbolGrad)" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+
+    <!-- Checkmark -->
+    <circle cx="28" cy="28" r="12" fill="#0d9488"/>
+    <path d="M22 28 L26 32 L34 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="90" y="52" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif" font-size="36" font-weight="700">
+    <tspan fill="#1e3a8a">Digi</tspan><tspan fill="#0d9488">Cards</tspan>
+  </text>
+</svg>
