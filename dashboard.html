@@ -571,6 +571,7 @@
 
 <script>
     const API = 'https://digicards-api.fly.dev/outreachos';
+    const TRIGGER = 'http://localhost:9090';
     let token = sessionStorage.getItem('dash_token') || '';
 
     function headers() {
@@ -729,8 +730,22 @@
 
     // ── Quick actions ─────────────────────────────────────────────────────────
     async function runJob(type) {
-        showToast(`Triggering ${type}... (runs on the server)`, 'success');
-        // Future: wire to a backend trigger endpoint
+        const labels = { outreach: 'Outreach', blog: 'Blog Generation', notify: 'Blog Notification' };
+        showToast(`Starting ${labels[type] || type}...`, 'success');
+        try {
+            const res = await fetch(`${TRIGGER}/run/${type}`, {
+                method: 'POST',
+                headers: { 'x-trigger-token': token }
+            });
+            if (res.ok) {
+                showToast(`${labels[type]} started — check logs for results`, 'success');
+                setTimeout(loadStats, 5000); // refresh stats after 5s
+            } else {
+                showToast('Trigger server not reachable — is it running?', 'error');
+            }
+        } catch {
+            showToast('Trigger server offline. Run: python3 trigger_server.py', 'error');
+        }
     }
 
     // ── Social toggles ────────────────────────────────────────────────────────
