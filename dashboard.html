@@ -924,7 +924,8 @@
             if (res.ok) {
                 const data = await res.json();
                 showResultModal(JOB_LABELS[type], data);
-                setTimeout(loadStats, 2000);
+                // Blog generation takes ~20s to write files; others are near-instant
+                setTimeout(loadStats, type === 'blog' ? 25000 : 2000);
             } else if (res.status === 0 || !res.ok) {
                 showResultModal(JOB_LABELS[type], {
                     status: 'error',
