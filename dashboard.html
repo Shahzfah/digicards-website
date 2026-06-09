@@ -358,6 +358,95 @@
         .form-input:focus { border-color: var(--accent); }
         .form-row { display: flex; gap: 10px; align-items: center; }
 
+        /* ── Frequency controls ── */
+        .freq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            padding: 20px 24px;
+        }
+        .freq-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+        }
+        .freq-card-title { font-weight: 700; font-size: .95rem; margin-bottom: 4px; }
+        .freq-note {
+            font-size: .75rem;
+            color: var(--yellow);
+            background: rgba(245,158,11,.08);
+            border: 1px solid rgba(245,158,11,.2);
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin: 10px 0 14px;
+            line-height: 1.5;
+        }
+        .freq-note.safe { color: var(--green); background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.2); }
+        .freq-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 12px; }
+        .freq-label { font-size: .85rem; color: var(--text-muted); flex: 1; }
+        .freq-select, .freq-input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: .875rem;
+            font-family: inherit;
+            padding: 7px 10px;
+            outline: none;
+            width: 110px;
+        }
+        .freq-select:focus, .freq-input:focus { border-color: var(--accent); }
+        .freq-hard-limit {
+            font-size: .72rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .freq-hard-limit span { color: var(--red); font-weight: 600; }
+
+        /* ── Result modal ── */
+        #result-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        #result-modal.open { display: flex; }
+        .modal-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            width: 100%;
+            max-width: 520px;
+            position: relative;
+        }
+        .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .result-banner {
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            font-weight: 600;
+            font-size: .95rem;
+            margin-bottom: 16px;
+        }
+        .result-banner.success { background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.3); color: var(--green); }
+        .result-banner.error   { background: rgba(239,68,68,.12);  border: 1px solid rgba(239,68,68,.3);  color: var(--red); }
+        .result-banner.skipped { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.3); color: var(--yellow); }
+        .result-detail { font-size: .85rem; color: var(--text-muted); line-height: 1.7; }
+        .result-detail li { margin-left: 16px; margin-bottom: 4px; }
+
         /* ── Toast ── */
         #toast {
             position: fixed;
@@ -518,6 +607,79 @@
             </div>
         </div>
 
+        <!-- Frequency controls -->
+        <div class="panel" style="margin-bottom:32px;">
+            <div class="panel-header">
+                <div class="panel-title">Send Frequency</div>
+                <button class="btn-sm btn-accent" onclick="saveFrequency()">Save Changes</button>
+            </div>
+            <div class="freq-grid" id="freq-grid">
+
+                <!-- Outreach -->
+                <div class="freq-card">
+                    <div class="freq-card-title">📧 Cold Outreach</div>
+                    <div class="freq-note">
+                        ⚠️ Minimum 30-day cooldown enforced. Emailing the same contact more often risks your domain being blacklisted by ISPs.
+                    </div>
+                    <div class="freq-row">
+                        <div class="freq-label">Cooldown between emails</div>
+                        <div>
+                            <input class="freq-input" type="number" id="cfg-cooldown" min="30" max="90" value="30"> days
+                            <div class="freq-hard-limit">Min: <span>30 days</span> (spam protection)</div>
+                        </div>
+                    </div>
+                    <div class="freq-row">
+                        <div class="freq-label">Daily send limit</div>
+                        <div>
+                            <input class="freq-input" type="number" id="cfg-daily-limit" min="1" max="20" value="20"> /day
+                            <div class="freq-hard-limit">Max: <span>20/day</span> (domain warm-up)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blog generation -->
+                <div class="freq-card">
+                    <div class="freq-card-title">✍️ Blog Generation</div>
+                    <div class="freq-note safe">
+                        ✓ Weekly posting is the sweet spot — consistent enough for SEO, not so frequent it overwhelms subscribers.
+                    </div>
+                    <div class="freq-row">
+                        <div class="freq-label">Post frequency</div>
+                        <select class="freq-select" id="cfg-blog-freq">
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Every 2 weeks</option>
+                        </select>
+                    </div>
+                    <div class="freq-row">
+                        <div class="freq-label">Publish day</div>
+                        <select class="freq-select" id="cfg-blog-day">
+                            <option value="monday">Monday</option>
+                            <option value="tuesday">Tuesday</option>
+                            <option value="wednesday">Wednesday</option>
+                            <option value="thursday">Thursday</option>
+                            <option value="friday">Friday</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Blog notify -->
+                <div class="freq-card">
+                    <div class="freq-card-title">🔔 Blog Notifications</div>
+                    <div class="freq-note safe">
+                        ✓ Sent automatically after each post. Tied to blog frequency — if you post weekly, subscribers get 1 email/week.
+                    </div>
+                    <div class="freq-row">
+                        <div class="freq-label">Auto-send to subscribers</div>
+                        <div class="toggle on" id="cfg-notify-auto" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div style="font-size:.78rem;color:var(--text-muted);margin-top:8px;">
+                        Max 2x/week hardcoded — more than that causes unsubscribes.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <!-- Social channels -->
         <div class="panel" style="margin-bottom:32px;">
             <div class="panel-header">
@@ -567,6 +729,16 @@
     </div>
 </div>
 
+<!-- Result modal -->
+<div id="result-modal">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-title" id="modal-title">Job Result</div>
+        <div class="result-banner" id="modal-banner"></div>
+        <div class="result-detail" id="modal-detail"></div>
+    </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -608,6 +780,7 @@
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         loadAll();
+        loadFrequency();
     }
 
     // ── Data loading ──────────────────────────────────────────────────────────
@@ -729,24 +902,92 @@
     }
 
     // ── Quick actions ─────────────────────────────────────────────────────────
+    const JOB_LABELS = { outreach: 'Cold Outreach', blog: 'Blog Generation', notify: 'Blog Notification' };
+
     async function runJob(type) {
-        const labels = { outreach: 'Outreach', blog: 'Blog Generation', notify: 'Blog Notification' };
-        showToast(`Starting ${labels[type] || type}...`, 'success');
+        const btn = event.currentTarget;
+        const orig = btn.querySelector('.action-title').textContent;
+        btn.querySelector('.action-title').textContent = 'Running...';
+        btn.style.opacity = '.6';
+        btn.style.pointerEvents = 'none';
+
         try {
             const res = await fetch(`${TRIGGER}/run/${type}`, {
                 method: 'POST',
                 headers: { 'x-trigger-token': token }
             });
+
+            btn.querySelector('.action-title').textContent = orig;
+            btn.style.opacity = '';
+            btn.style.pointerEvents = '';
+
             if (res.ok) {
-                showToast(`${labels[type]} started — check logs for results`, 'success');
-                setTimeout(loadStats, 5000); // refresh stats after 5s
-            } else {
-                showToast('Trigger server not reachable — is it running?', 'error');
+                const data = await res.json();
+                showResultModal(JOB_LABELS[type], data);
+                setTimeout(loadStats, 2000);
+            } else if (res.status === 0 || !res.ok) {
+                showResultModal(JOB_LABELS[type], {
+                    status: 'error',
+                    summary: 'Could not reach trigger server',
+                    errors: ['Make sure trigger_server.py is running on this machine: python3 trigger_server.py']
+                });
             }
         } catch {
-            showToast('Trigger server offline. Run: python3 trigger_server.py', 'error');
+            btn.querySelector('.action-title').textContent = orig;
+            btn.style.opacity = '';
+            btn.style.pointerEvents = '';
+            showResultModal(JOB_LABELS[type], {
+                status: 'error',
+                summary: 'Trigger server is offline',
+                errors: [
+                    'The trigger server only runs on your local machine.',
+                    'Start it with: cd marketing-automation && python3 trigger_server.py',
+                    'Note: Quick Actions only work when accessing the dashboard locally.'
+                ]
+            });
         }
     }
+
+    // ── Result modal ──────────────────────────────────────────────────────────
+    function showResultModal(jobName, data) {
+        document.getElementById('modal-title').textContent = `${jobName} — Result`;
+
+        const banner = document.getElementById('modal-banner');
+        banner.className = `result-banner ${data.status}`;
+        banner.textContent = data.summary || 'Done';
+
+        const detail = document.getElementById('modal-detail');
+        const lines = [];
+
+        if (data.sent !== undefined) {
+            lines.push(`<li><strong>${data.sent}</strong> email(s) sent</li>`);
+            lines.push(`<li><strong>${data.skipped}</strong> skipped (${data.cooldown_days}-day cooldown)</li>`);
+            if (data.failed) lines.push(`<li><strong>${data.failed}</strong> failed</li>`);
+        }
+
+        if (data.skipped_reasons && data.skipped_reasons.length) {
+            data.skipped_reasons.slice(0, 3).forEach(r => lines.push(`<li style="color:var(--yellow)">${r}</li>`));
+        }
+
+        if (data.errors && data.errors.length) {
+            data.errors.forEach(e => lines.push(`<li style="color:var(--red)">${e}</li>`));
+        }
+
+        if (data.output) {
+            lines.push(`<li style="margin-top:8px;font-family:monospace;font-size:.75rem;color:var(--text-muted);white-space:pre-wrap;">${data.output}</li>`);
+        }
+
+        detail.innerHTML = lines.length ? `<ul>${lines.join('')}</ul>` : '';
+        document.getElementById('result-modal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('result-modal').classList.remove('open');
+    }
+
+    document.getElementById('result-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
 
     // ── Social toggles ────────────────────────────────────────────────────────
     const socialState = JSON.parse(localStorage.getItem('social_state') || '{}');
@@ -776,6 +1017,56 @@
         t.className = `show ${type}`;
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => t.className = '', 3000);
+    }
+
+    // ── Frequency config ──────────────────────────────────────────────────────
+    async function loadFrequency() {
+        try {
+            const res = await fetch(`${TRIGGER}/config`, { headers: { 'x-trigger-token': token } });
+            if (!res.ok) return;
+            const cfg = await res.json();
+            const o = cfg.outreach || {};
+            const b = cfg.blog || {};
+            const n = cfg.blog_notify || {};
+            if (o.cooldown_days)  document.getElementById('cfg-cooldown').value     = o.cooldown_days;
+            if (o.daily_limit)    document.getElementById('cfg-daily-limit').value  = o.daily_limit;
+            if (b.frequency)      document.getElementById('cfg-blog-freq').value    = b.frequency;
+            if (b.day)            document.getElementById('cfg-blog-day').value     = b.day;
+            if (n.auto_send === false) document.getElementById('cfg-notify-auto').classList.remove('on');
+        } catch {
+            // trigger server offline — config panel stays at defaults
+        }
+    }
+
+    async function saveFrequency() {
+        const cooldown   = Math.max(30, parseInt(document.getElementById('cfg-cooldown').value) || 30);
+        const dailyLimit = Math.min(20, parseInt(document.getElementById('cfg-daily-limit').value) || 20);
+        const blogFreq   = document.getElementById('cfg-blog-freq').value;
+        const blogDay    = document.getElementById('cfg-blog-day').value;
+        const autoNotify = document.getElementById('cfg-notify-auto').classList.contains('on');
+
+        // Snap UI back to enforced values
+        document.getElementById('cfg-cooldown').value    = cooldown;
+        document.getElementById('cfg-daily-limit').value = dailyLimit;
+
+        const config = {
+            outreach:   { cooldown_days: cooldown, daily_limit: dailyLimit, send_time: "08:00", days: ["monday","tuesday","wednesday","thursday","friday"] },
+            blog:       { frequency: blogFreq, day: blogDay, time: "09:00" },
+            blog_notify:{ auto_send: autoNotify },
+            social:     { post_after_blog: true, platforms: [] }
+        };
+
+        try {
+            const res = await fetch(`${TRIGGER}/config`, {
+                method: 'POST',
+                headers: { 'x-trigger-token': token, 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+            if (res.ok) showToast('Frequency settings saved', 'success');
+            else showToast('Could not save — trigger server offline', 'error');
+        } catch {
+            showToast('Trigger server offline — settings not saved', 'error');
+        }
     }
 
     // ── Init ──────────────────────────────────────────────────────────────────
