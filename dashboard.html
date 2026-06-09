@@ -789,32 +789,49 @@
     }
 
     async function loadStats() {
-        const res = await fetch(`${API}/dashboard/stats`, { headers: headers() });
-        if (!res.ok) return;
-        const d = await res.json();
-        document.getElementById('s-sent').textContent    = d.emails_sent;
-        document.getElementById('s-blogs').textContent   = d.blogs_published;
-        document.getElementById('s-subs').textContent    = d.subscribers;
-        document.getElementById('s-signups').textContent = d.early_access_signups;
-        document.getElementById('s-next-out').textContent  = d.next_outreach;
-        document.getElementById('s-next-blog').textContent = d.next_blog_gen;
+        // CSV-based stats come from trigger server (local machine)
+        // Signups come from backend DB (always available)
+        const [backendRes, localRes] = await Promise.allSettled([
+            fetch(`${API}/dashboard/stats`, { headers: headers() }),
+            fetch(`${TRIGGER}/stats`, { headers: { 'x-trigger-token': token } })
+        ]);
 
-        const tbody = document.getElementById('jobs-tbody');
-        const empty = document.getElementById('jobs-empty');
-        if (!d.recent_jobs || d.recent_jobs.length === 0) {
-            tbody.innerHTML = '';
-            empty.style.display = 'block';
-            return;
+        // Signups from backend
+        if (backendRes.status === 'fulfilled' && backendRes.value.ok) {
+            const d = await backendRes.value.json();
+            document.getElementById('s-signups').textContent = d.early_access_signups;
         }
-        empty.style.display = 'none';
-        tbody.innerHTML = d.recent_jobs.map(j => `
-            <tr>
-                <td><strong>${j.job || '—'}</strong></td>
-                <td><span class="badge ${j.status === 'success' ? 'badge-green' : 'badge-red'}">${j.status}</span></td>
-                <td style="color:var(--text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${j.detail || '—'}</td>
-                <td style="color:var(--text-muted);font-size:.8rem;">${(j.timestamp || '').slice(0,16)}</td>
-            </tr>
-        `).join('');
+
+        // CSV stats from trigger server
+        if (localRes.status === 'fulfilled' && localRes.value.ok) {
+            const d = await localRes.value.json();
+            document.getElementById('s-sent').textContent      = d.emails_sent;
+            document.getElementById('s-blogs').textContent     = d.blogs_published;
+            document.getElementById('s-subs').textContent      = d.subscribers;
+            document.getElementById('s-next-out').textContent  = d.next_outreach;
+            document.getElementById('s-next-blog').textContent = d.next_blog_gen;
+
+            const tbody = document.getElementById('jobs-tbody');
+            const empty = document.getElementById('jobs-empty');
+            if (!d.recent_jobs || d.recent_jobs.length === 0) {
+                tbody.innerHTML = ''; empty.style.display = 'block';
+            } else {
+                empty.style.display = 'none';
+                tbody.innerHTML = d.recent_jobs.map(j => `
+                    <tr>
+                        <td><strong>${j.job || '—'}</strong></td>
+                        <td><span class="badge ${j.status === 'success' ? 'badge-green' : 'badge-red'}">${j.status}</span></td>
+                        <td style="color:var(--text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${j.detail || '—'}</td>
+                        <td style="color:var(--text-muted);font-size:.8rem;">${(j.timestamp || '').slice(0,16)}</td>
+                    </tr>
+                `).join('');
+            }
+        } else {
+            // Trigger server offline — show dashes
+            ['s-sent','s-blogs','s-subs','s-next-out','s-next-blog'].forEach(id => {
+                if (document.getElementById(id).textContent === '—') return;
+            });
+        }
     }
 
     async function loadSignups() {
