@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OutreachOS Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="logo/favicon.png">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0f1117;
+            --surface:   #1a1d27;
+            --surface2:  #22263a;
+            --border:    rgba(255,255,255,.08);
+            --accent:    #6366f1;
+            --accent2:   #0ea5e9;
+            --green:     #10b981;
+            --yellow:    #f59e0b;
+            --red:       #ef4444;
+            --text:      #f1f5f9;
+            --text-muted:#94a3b8;
+            --radius:    12px;
+            --radius-sm: 8px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── Login screen ── */
+        #login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f1117 0%, #1a1d27 100%);
+        }
+        .login-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+        .login-logo span {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-card h2 { font-size: 1.5rem; margin-bottom: 8px; }
+        .login-card p  { color: var(--text-muted); font-size: .9rem; margin-bottom: 32px; }
+        .login-card input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        .login-card input:focus { border-color: var(--accent); }
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity .2s;
+        }
+        .btn-primary:hover { opacity: .9; }
+        .login-error {
+            color: var(--red);
+            font-size: .875rem;
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* ── App shell ── */
+        #app { display: none; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity: 1; }
+            50%      { opacity: .4; }
+        }
+        .topbar-logout {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            font-size: .875rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all .2s;
+        }
+        .topbar-logout:hover { border-color: var(--red); color: var(--red); }
+
+        .main { padding: 32px; max-width: 1400px; margin: 0 auto; }
+
+        /* ── Section headers ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        /* ── Stat cards ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+        .stat-label { font-size: .8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+        .stat-value { font-size: 2rem; font-weight: 800; }
+        .stat-value.accent  { color: var(--accent); }
+        .stat-value.accent2 { color: var(--accent2); }
+        .stat-value.green   { color: var(--green); }
+        .stat-value.yellow  { color: var(--yellow); }
+        .stat-sub { font-size: .8rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* ── Two-column layout ── */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+        /* ── Card panels ── */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .panel-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .panel-title { font-weight: 700; font-size: 1rem; }
+        .panel-body { padding: 0; }
+
+        /* ── Tables ── */
+        table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+        th {
+            text-align: left;
+            padding: 12px 20px;
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid var(--border);
+        }
+        td { padding: 14px 20px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,.02); }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: .75rem;
+            font-weight: 600;
+        }
+        .badge-green  { background: rgba(16,185,129,.15); color: var(--green); }
+        .badge-yellow { background: rgba(245,158,11,.15);  color: var(--yellow); }
+        .badge-red    { background: rgba(239,68,68,.15);   color: var(--red); }
+        .badge-blue   { background: rgba(99,102,241,.15);  color: var(--accent); }
+
+        .empty-state {
+            padding: 48px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: .9rem;
+        }
+
+        /* ── Action buttons ── */
+        .btn-sm {
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all .2s;
+            border: none;
+        }
+        .btn-accent  { background: var(--accent); color: white; }
+        .btn-accent:hover { opacity: .85; }
+        .btn-ghost   { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+        .btn-danger  { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.2); }
+        .btn-danger:hover { background: rgba(239,68,68,.25); }
+
+        /* ── Quick actions ── */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            padding: 20px 24px;
+        }
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 16px 20px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit;
+            text-align: left;
+        }
+        .action-btn:hover { border-color: var(--accent); background: rgba(99,102,241,.08); }
+        .action-btn .action-title { font-weight: 600; font-size: .9rem; color: var(--text); }
+        .action-btn .action-desc  { font-size: .78rem; color: var(--text-muted); }
+        .action-btn .action-icon  { font-size: 1.3rem; margin-bottom: 4px; }
+
+        /* ── Social channels ── */
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            padding: 20px 24px;
+        }
+        .social-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+        .social-icon { font-size: 1.8rem; }
+        .social-name { font-size: .85rem; font-weight: 600; }
+        .social-status { font-size: .75rem; color: var(--text-muted); }
+        .toggle {
+            position: relative;
+            width: 40px; height: 22px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .toggle.on { background: var(--accent); border-color: var(--accent); }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 16px; height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: transform .2s;
+        }
+        .toggle.on::after { transform: translateX(18px); }
+
+        /* ── Add brokerage form ── */
+        .add-form {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+        .add-form.open { display: block; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+        .form-input {
+            padding: 10px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: .875rem;
+            font-family: inherit;
+            outline: none;
+            width: 100%;
+        }
+        .form-input:focus { border-color: var(--accent); }
+        .form-row { display: flex; gap: 10px; align-items: center; }
+
+        /* ── Toast ── */
+        #toast {
+            position: fixed;
+            bottom: 32px; right: 32px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 20px;
+            font-size: .875rem;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,.4);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all .25s;
+            pointer-events: none;
+        }
+        #toast.show { opacity: 1; transform: translateY(0); }
+        #toast.success { border-color: var(--green); color: var(--green); }
+        #toast.error   { border-color: var(--red);   color: var(--red);   }
+    </style>
+</head>
+<body>
+
+<!-- ── Login ── -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">
+            <img src="logo/app-icon.png" width="32" height="32" alt="DigiCards">
+            <span>OutreachOS</span>
+        </div>
+        <h2>Dashboard</h2>
+        <p>Enter your password to continue</p>
+        <form onsubmit="doLogin(event)">
+            <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
+            <button type="submit" class="btn-primary">Sign In</button>
+        </form>
+        <div class="login-error" id="login-error">Incorrect password</div>
+    </div>
+</div>
+
+<!-- ── App ── -->
+<div id="app">
+    <div class="topbar">
+        <div class="topbar-brand">
+            <img src="logo/app-icon.png" width="28" height="28" alt="">
+            OutreachOS Dashboard
+        </div>
+        <div class="topbar-actions">
+            <div class="status-dot" title="Scheduler running"></div>
+            <span style="font-size:.8rem;color:var(--text-muted);">Scheduler live</span>
+            <button class="topbar-logout" onclick="doLogout()">Sign out</button>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <!-- Stats -->
+        <div class="section-header">
+            <div class="section-title">Overview</div>
+            <button class="btn-sm btn-ghost" onclick="loadAll()">Refresh</button>
+        </div>
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card"><div class="stat-label">Emails Sent</div><div class="stat-value accent" id="s-sent">—</div><div class="stat-sub">all time</div></div>
+            <div class="stat-card"><div class="stat-label">Blogs Published</div><div class="stat-value accent2" id="s-blogs">—</div><div class="stat-sub">all time</div></div>
+            <div class="stat-card"><div class="stat-label">Subscribers</div><div class="stat-value green" id="s-subs">—</div><div class="stat-sub">blog list</div></div>
+            <div class="stat-card"><div class="stat-label">Early Access</div><div class="stat-value yellow" id="s-signups">—</div><div class="stat-sub">OutreachOS waitlist</div></div>
+            <div class="stat-card"><div class="stat-label">Next Outreach</div><div class="stat-value" style="font-size:1.1rem" id="s-next-out">—</div><div class="stat-sub">schedule</div></div>
+            <div class="stat-card"><div class="stat-label">Next Blog Gen</div><div class="stat-value" style="font-size:1.1rem" id="s-next-blog">—</div><div class="stat-sub">schedule</div></div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="panel" style="margin-bottom:32px;">
+            <div class="panel-header">
+                <div class="panel-title">Quick Actions</div>
+                <span style="font-size:.8rem;color:var(--text-muted);">Trigger a job manually</span>
+            </div>
+            <div class="actions-grid">
+                <button class="action-btn" onclick="runJob('outreach')">
+                    <div class="action-icon">📧</div>
+                    <div class="action-title">Run Outreach</div>
+                    <div class="action-desc">Send cold emails to brokerage list now</div>
+                </button>
+                <button class="action-btn" onclick="runJob('blog')">
+                    <div class="action-icon">✍️</div>
+                    <div class="action-title">Generate Blog Post</div>
+                    <div class="action-desc">AI-generate and publish a new post</div>
+                </button>
+                <button class="action-btn" onclick="runJob('notify')">
+                    <div class="action-icon">🔔</div>
+                    <div class="action-title">Send Blog Notification</div>
+                    <div class="action-desc">Notify subscribers of latest post</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Two column: signups + recent jobs -->
+        <div class="two-col">
+
+            <!-- Early access signups -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Early Access Signups</div>
+                    <span class="badge badge-yellow" id="signup-count-badge">0</span>
+                </div>
+                <div class="panel-body">
+                    <table>
+                        <thead><tr><th>Name / Email</th><th>Company</th><th>Team</th><th>Date</th></tr></thead>
+                        <tbody id="signups-tbody"></tbody>
+                    </table>
+                    <div class="empty-state" id="signups-empty" style="display:none;">No signups yet — share the landing page!</div>
+                </div>
+            </div>
+
+            <!-- Recent jobs -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Recent Jobs</div>
+                </div>
+                <div class="panel-body">
+                    <table>
+                        <thead><tr><th>Job</th><th>Status</th><th>Detail</th><th>Time</th></tr></thead>
+                        <tbody id="jobs-tbody"></tbody>
+                    </table>
+                    <div class="empty-state" id="jobs-empty" style="display:none;">No jobs run yet.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Brokerage contacts -->
+        <div class="panel" style="margin-bottom:32px;">
+            <div class="panel-header">
+                <div class="panel-title">Brokerage Contacts</div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <span class="badge badge-blue" id="broker-count-badge">0</span>
+                    <button class="btn-sm btn-accent" onclick="toggleAddForm()">+ Add Contact</button>
+                </div>
+            </div>
+            <div class="add-form" id="add-form">
+                <div class="form-grid">
+                    <input class="form-input" id="f-bname" placeholder="Brokerage name">
+                    <input class="form-input" id="f-cname" placeholder="Contact first name">
+                    <input class="form-input" id="f-email" placeholder="Email address" type="email">
+                    <input class="form-input" id="f-agents" placeholder="Agent count (e.g. 25)">
+                    <input class="form-input" id="f-location" placeholder="Location (e.g. Toronto ON)">
+                </div>
+                <div class="form-row">
+                    <button class="btn-sm btn-accent" onclick="addBrokerage()">Save Contact</button>
+                    <button class="btn-sm btn-ghost" onclick="toggleAddForm()">Cancel</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <table>
+                    <thead><tr><th>Brokerage</th><th>Contact</th><th>Email</th><th>Agents</th><th>Location</th><th></th></tr></thead>
+                    <tbody id="brokers-tbody"></tbody>
+                </table>
+                <div class="empty-state" id="brokers-empty" style="display:none;">No contacts yet — add your first brokerage above.</div>
+            </div>
+        </div>
+
+        <!-- Social channels -->
+        <div class="panel" style="margin-bottom:32px;">
+            <div class="panel-header">
+                <div class="panel-title">Social Media Channels</div>
+                <span style="font-size:.8rem;color:var(--text-muted);">Auto-post after each blog publish</span>
+            </div>
+            <div class="social-grid">
+                <div class="social-card">
+                    <div class="social-icon">💼</div>
+                    <div class="social-name">LinkedIn</div>
+                    <div class="social-status">Not connected</div>
+                    <div class="toggle" id="toggle-linkedin" onclick="toggleSocial('linkedin')" title="Connect LinkedIn"></div>
+                </div>
+                <div class="social-card">
+                    <div class="social-icon">𝕏</div>
+                    <div class="social-name">Twitter / X</div>
+                    <div class="social-status">Not connected</div>
+                    <div class="toggle" id="toggle-twitter" onclick="toggleSocial('twitter')" title="Connect Twitter/X"></div>
+                </div>
+                <div class="social-card">
+                    <div class="social-icon">📘</div>
+                    <div class="social-name">Facebook</div>
+                    <div class="social-status">Not connected</div>
+                    <div class="toggle" id="toggle-facebook" onclick="toggleSocial('facebook')" title="Connect Facebook"></div>
+                </div>
+                <div class="social-card">
+                    <div class="social-icon">📸</div>
+                    <div class="social-name">Instagram</div>
+                    <div class="social-status">Not connected</div>
+                    <div class="toggle" id="toggle-instagram" onclick="toggleSocial('instagram')" title="Connect Instagram"></div>
+                </div>
+                <div class="social-card">
+                    <div class="social-icon">🎵</div>
+                    <div class="social-name">TikTok</div>
+                    <div class="social-status">Not connected</div>
+                    <div class="toggle" id="toggle-tiktok" onclick="toggleSocial('tiktok')" title="Connect TikTok"></div>
+                </div>
+                <div class="social-card">
+                    <div class="social-icon">▶️</div>
+                    <div class="social-name">YouTube</div>
+                    <div class="social-status">Not connected</div>
+                    <div class="toggle" id="toggle-youtube" onclick="toggleSocial('youtube')" title="Connect YouTube"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+    const API = 'https://digicards-api.fly.dev/outreachos';
+    let token = sessionStorage.getItem('dash_token') || '';
+
+    function headers() {
+        return { 'Content-Type': 'application/json', 'x-dashboard-password': token };
+    }
+
+    // ── Auth ──────────────────────────────────────────────────────────────────
+    async function doLogin(e) {
+        e.preventDefault();
+        const pw = document.getElementById('pw-input').value;
+        const res = await fetch(`${API}/dashboard/auth`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: pw })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            token = data.token;
+            sessionStorage.setItem('dash_token', token);
+            showApp();
+        } else {
+            document.getElementById('login-error').style.display = 'block';
+        }
+    }
+
+    function doLogout() {
+        sessionStorage.removeItem('dash_token');
+        token = '';
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+    }
+
+    function showApp() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        loadAll();
+    }
+
+    // ── Data loading ──────────────────────────────────────────────────────────
+    async function loadAll() {
+        await Promise.all([loadStats(), loadSignups(), loadBrokerages()]);
+    }
+
+    async function loadStats() {
+        const res = await fetch(`${API}/dashboard/stats`, { headers: headers() });
+        if (!res.ok) return;
+        const d = await res.json();
+        document.getElementById('s-sent').textContent    = d.emails_sent;
+        document.getElementById('s-blogs').textContent   = d.blogs_published;
+        document.getElementById('s-subs').textContent    = d.subscribers;
+        document.getElementById('s-signups').textContent = d.early_access_signups;
+        document.getElementById('s-next-out').textContent  = d.next_outreach;
+        document.getElementById('s-next-blog').textContent = d.next_blog_gen;
+
+        const tbody = document.getElementById('jobs-tbody');
+        const empty = document.getElementById('jobs-empty');
+        if (!d.recent_jobs || d.recent_jobs.length === 0) {
+            tbody.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        tbody.innerHTML = d.recent_jobs.map(j => `
+            <tr>
+                <td><strong>${j.job || '—'}</strong></td>
+                <td><span class="badge ${j.status === 'success' ? 'badge-green' : 'badge-red'}">${j.status}</span></td>
+                <td style="color:var(--text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${j.detail || '—'}</td>
+                <td style="color:var(--text-muted);font-size:.8rem;">${(j.timestamp || '').slice(0,16)}</td>
+            </tr>
+        `).join('');
+    }
+
+    async function loadSignups() {
+        const res = await fetch(`${API}/dashboard/signups`, { headers: headers() });
+        if (!res.ok) return;
+        const rows = await res.json();
+        const badge = document.getElementById('signup-count-badge');
+        const tbody = document.getElementById('signups-tbody');
+        const empty = document.getElementById('signups-empty');
+        badge.textContent = rows.length;
+        if (rows.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+        tbody.innerHTML = rows.map(r => `
+            <tr>
+                <td>
+                    <div style="font-weight:600;">${r.name || '—'}</div>
+                    <div style="font-size:.8rem;color:var(--text-muted);">${r.email}</div>
+                </td>
+                <td>${r.company || '—'}</td>
+                <td>${r.agent_count ? r.agent_count + ' agents' : '—'}</td>
+                <td style="font-size:.8rem;color:var(--text-muted);">${(r.signed_up_at || '').slice(0,10)}</td>
+            </tr>
+        `).join('');
+    }
+
+    async function loadBrokerages() {
+        const res = await fetch(`${API}/dashboard/brokerages`, { headers: headers() });
+        if (!res.ok) return;
+        const rows = await res.json();
+        const badge = document.getElementById('broker-count-badge');
+        const tbody = document.getElementById('brokers-tbody');
+        const empty = document.getElementById('brokers-empty');
+        badge.textContent = rows.length;
+        if (rows.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+        tbody.innerHTML = rows.map(r => `
+            <tr>
+                <td><strong>${r.brokerage_name || '—'}</strong></td>
+                <td>${r.contact_name || '—'}</td>
+                <td style="color:var(--text-muted);">${r.email}</td>
+                <td>${r.agent_count || '—'}</td>
+                <td style="color:var(--text-muted);">${r.location || '—'}</td>
+                <td><button class="btn-sm btn-danger" onclick="deleteBrokerage('${r.email}')">Remove</button></td>
+            </tr>
+        `).join('');
+    }
+
+    // ── Add / delete brokerage ────────────────────────────────────────────────
+    function toggleAddForm() {
+        document.getElementById('add-form').classList.toggle('open');
+    }
+
+    async function addBrokerage() {
+        const body = {
+            brokerage_name: document.getElementById('f-bname').value.trim(),
+            contact_name:   document.getElementById('f-cname').value.trim(),
+            email:          document.getElementById('f-email').value.trim(),
+            agent_count:    document.getElementById('f-agents').value.trim(),
+            location:       document.getElementById('f-location').value.trim(),
+        };
+        if (!body.brokerage_name || !body.contact_name || !body.email) {
+            showToast('Fill in brokerage name, contact name, and email', 'error'); return;
+        }
+        const res = await fetch(`${API}/dashboard/brokerages`, {
+            method: 'POST', headers: headers(), body: JSON.stringify(body)
+        });
+        if (res.ok) {
+            showToast('Contact added', 'success');
+            toggleAddForm();
+            ['f-bname','f-cname','f-email','f-agents','f-location'].forEach(id => document.getElementById(id).value = '');
+            loadBrokerages();
+        } else {
+            const err = await res.json();
+            showToast(err.detail || 'Error adding contact', 'error');
+        }
+    }
+
+    async function deleteBrokerage(email) {
+        if (!confirm(`Remove ${email} from the outreach list?`)) return;
+        const res = await fetch(`${API}/dashboard/brokerages/${encodeURIComponent(email)}`, {
+            method: 'DELETE', headers: headers()
+        });
+        if (res.ok) { showToast('Contact removed', 'success'); loadBrokerages(); }
+        else showToast('Error removing contact', 'error');
+    }
+
+    // ── Quick actions ─────────────────────────────────────────────────────────
+    async function runJob(type) {
+        showToast(`Triggering ${type}... (runs on the server)`, 'success');
+        // Future: wire to a backend trigger endpoint
+    }
+
+    // ── Social toggles ────────────────────────────────────────────────────────
+    const socialState = JSON.parse(localStorage.getItem('social_state') || '{}');
+
+    function initSocialToggles() {
+        ['linkedin','twitter','facebook','instagram','tiktok','youtube'].forEach(ch => {
+            if (socialState[ch]) document.getElementById(`toggle-${ch}`).classList.add('on');
+        });
+    }
+
+    function toggleSocial(channel) {
+        const el = document.getElementById(`toggle-${channel}`);
+        const isOn = el.classList.toggle('on');
+        socialState[channel] = isOn;
+        localStorage.setItem('social_state', JSON.stringify(socialState));
+        showToast(
+            isOn ? `${channel} enabled — connect API keys to activate posting` : `${channel} disabled`,
+            isOn ? 'success' : 'success'
+        );
+    }
+
+    // ── Toast ─────────────────────────────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `show ${type}`;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.className = '', 3000);
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    if (token) {
+        showApp();
+    }
+    initSocialToggles();
+</script>
+
+</body>
+</html>
