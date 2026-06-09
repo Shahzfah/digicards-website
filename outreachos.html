@@ -1089,24 +1089,24 @@
             btn.disabled = true;
 
             try {
-                // Store locally for now; wire to backend when API route is built
-                const existing = JSON.parse(localStorage.getItem('outreachos_signups') || '[]');
-                existing.push({ email, date: new Date().toISOString() });
-                localStorage.setItem('outreachos_signups', JSON.stringify(existing));
-
-                // Show success
-                document.getElementById('signup-success').style.display = 'block';
-                e.target.style.display = 'none';
-
-                // Send notification email to Fahad via backend (graceful if unavailable)
-                await fetch('https://digicards-api.fly.dev/outreachos/signup', {
+                const res = await fetch('https://digicards-api.fly.dev/outreachos/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
-                }).catch(() => {});
+                });
+                if (!res.ok) throw new Error('api_error');
+
+                document.getElementById('signup-success').style.display = 'block';
+                e.target.style.display = 'none';
             } catch {
-                btn.textContent = 'Get Access';
-                btn.disabled = false;
+                // Fallback: save locally so no signup is ever lost
+                const existing = JSON.parse(localStorage.getItem('outreachos_signups') || '[]');
+                if (!existing.find(s => s.email === email)) {
+                    existing.push({ email, date: new Date().toISOString() });
+                    localStorage.setItem('outreachos_signups', JSON.stringify(existing));
+                }
+                document.getElementById('signup-success').style.display = 'block';
+                e.target.style.display = 'none';
             }
         }
     </script>
