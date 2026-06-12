@@ -88,6 +88,50 @@
         .legal-content td {
             color: var(--text-secondary);
         }
+        /* Header nav layout */
+        .header { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #e5e7eb; }
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; max-width: 1200px; margin: 0 auto; }
+        .nav .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.25rem; text-decoration: none; color: #111827; }
+        .nav .nav-links { display: flex; gap: 24px; }
+        .nav .nav-links a { color: #6b7280; font-weight: 500; text-decoration: none; font-size: 0.95rem; }
+        .nav .nav-links a:hover { color: #6366f1; }
+        /* Hamburger */
+        .legal-hamburger {
+            display: none; flex-direction: column; justify-content: center;
+            gap: 5px; width: 40px; height: 40px; padding: 6px;
+            background: none; border: none; cursor: pointer; border-radius: 8px;
+        }
+        .legal-hamburger span { display: block; width: 22px; height: 2px; background: #111827; border-radius: 2px; }
+        .legal-menu-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 1100; opacity: 0; transition: opacity .25s;
+        }
+        .legal-menu-overlay.open { display: block; opacity: 1; }
+        .legal-mobile-menu {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: min(320px,85vw); background: #fff; z-index: 1200;
+            display: flex; flex-direction: column;
+            transform: translateX(100%);
+            transition: transform .3s cubic-bezier(.4,0,.2,1);
+            box-shadow: -4px 0 24px rgba(0,0,0,.12);
+        }
+        .legal-mobile-menu.open { transform: translateX(0); }
+        .legal-menu-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 20px 16px; border-bottom: 1px solid #e5e7eb;
+        }
+        .legal-menu-close { background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; color: #6b7280; }
+        .legal-menu-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 12px; font-size: 1rem; font-weight: 500;
+            color: #111827; border-radius: 10px; text-decoration: none; transition: background .2s;
+        }
+        .legal-menu-link:hover { background: rgba(99,102,241,.07); color: #6366f1; }
+        .legal-menu-link--highlight { color: #0ea5e9; font-weight: 600; background: rgba(14,165,233,.07); margin-top: 4px; }
+        @media (max-width: 768px) {
+            .legal-hamburger { display: flex; }
+            .nav .nav-links { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -104,8 +148,39 @@
                 <a href="privacy.html">Privacy</a>
                 <a href="terms.html">Terms</a>
             </div>
+            <button class="legal-hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
         </nav>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="legal-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="legal-mobile-menu" id="mobileMenu">
+        <div class="legal-menu-header">
+            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.25rem;text-decoration:none;color:inherit;">
+                <img src="logo/app-icon.png" alt="DigiCards" width="32" height="32" style="border-radius:6px;">
+                <span>DigiCards</span>
+            </a>
+            <button class="legal-menu-close" id="mobileMenuClose" aria-label="Close menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+        <nav style="flex:1;display:flex;flex-direction:column;padding:12px;">
+            <a href="index.html#features" class="legal-menu-link">Features</a>
+            <a href="index.html#pricing" class="legal-menu-link">Pricing</a>
+            <a href="privacy.html" class="legal-menu-link">Privacy Policy</a>
+            <a href="terms.html" class="legal-menu-link">Terms of Service</a>
+            <a href="blog.html" class="legal-menu-link">Blog</a>
+            <a href="outreachos.html" class="legal-menu-link legal-menu-link--highlight">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                OutreachOS
+            </a>
+        </nav>
+        <div style="padding:16px 20px 28px;border-top:1px solid #e5e7eb;">
+            <a href="index.html#download" style="display:block;width:100%;text-align:center;padding:12px;background:#6366f1;color:#fff;border-radius:10px;font-weight:600;text-decoration:none;">Get the App</a>
+        </div>
+    </div>
 
     <main class="legal-content">
         <h1>Terms of Service</h1>
@@ -444,5 +519,19 @@
             <p class="copyright">&copy; 2026 DigiCards. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        (function() {
+            var btn = document.getElementById('hamburgerBtn');
+            var menu = document.getElementById('mobileMenu');
+            var overlay = document.getElementById('mobileMenuOverlay');
+            var closeBtn = document.getElementById('mobileMenuClose');
+            function open() { menu.classList.add('open'); overlay.classList.add('open'); btn.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
+            function close() { menu.classList.remove('open'); overlay.classList.remove('open'); btn.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
+            btn.addEventListener('click', open);
+            closeBtn.addEventListener('click', close);
+            overlay.addEventListener('click', close);
+            document.querySelectorAll('.legal-menu-link').forEach(function(l){ l.addEventListener('click', close); });
+        })();
+    </script>
 </body>
 </html>

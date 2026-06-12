@@ -26,8 +26,38 @@
                 <a href="blog.html">Blog</a>
             </div>
             <a href="index.html#download" class="btn btn-primary btn-nav">Get the App</a>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
         </div>
     </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <a href="index.html" class="logo">
+                <img src="logo/app-icon.png" alt="DigiCards" class="logo-icon" width="32" height="32">
+                <span class="logo-text">DigiCards</span>
+            </a>
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+        <nav class="mobile-menu-nav">
+            <a href="index.html#features" class="mobile-menu-link">Features</a>
+            <a href="index.html#how-it-works" class="mobile-menu-link">How it Works</a>
+            <a href="index.html#pricing" class="mobile-menu-link">Pricing</a>
+            <a href="blog.html" class="mobile-menu-link">Blog</a>
+            <a href="outreachos.html" class="mobile-menu-link mobile-menu-link--highlight">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                OutreachOS
+            </a>
+        </nav>
+        <div class="mobile-menu-footer">
+            <a href="index.html#download" class="btn btn-primary" style="width:100%;text-align:center;">Get the App</a>
+        </div>
+    </div>
 
     <!-- Blog Header -->
     <section class="hero" style="padding: 100px 0 60px;">
@@ -237,6 +267,38 @@
         }
 
         renderBlogPosts();
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // Hamburger menu
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+
+        function openMobileMenu() {
+            mobileMenu.classList.add('open');
+            mobileMenuOverlay.classList.add('open');
+            hamburgerBtn.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileMenu() {
+            mobileMenu.classList.remove('open');
+            mobileMenuOverlay.classList.remove('open');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        hamburgerBtn.addEventListener('click', openMobileMenu);
+        mobileMenuClose.addEventListener('click', closeMobileMenu);
+        mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+        document.querySelectorAll('.mobile-menu-link:not([href^="#"])').forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+        });
     </script>
 </body>
 </html>
