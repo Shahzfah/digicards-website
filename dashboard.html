@@ -687,41 +687,36 @@
                 <span style="font-size:.8rem;color:var(--text-muted);">Auto-post after each blog publish</span>
             </div>
             <div class="social-grid">
-                <div class="social-card">
+                <div class="social-card" id="linkedin-card">
                     <div class="social-icon">💼</div>
                     <div class="social-name">LinkedIn</div>
-                    <div class="social-status">Not connected</div>
-                    <div class="toggle" id="toggle-linkedin" onclick="toggleSocial('linkedin')" title="Connect LinkedIn"></div>
+                    <div class="social-status" id="linkedin-status">Not connected</div>
+                    <button id="linkedin-btn" onclick="connectLinkedIn()" style="margin-top:8px;padding:5px 12px;font-size:.75rem;border-radius:6px;border:1px solid #0a66c2;background:transparent;color:#0a66c2;cursor:pointer;font-weight:600;">Connect</button>
                 </div>
                 <div class="social-card">
                     <div class="social-icon">𝕏</div>
                     <div class="social-name">Twitter / X</div>
-                    <div class="social-status">Not connected</div>
-                    <div class="toggle" id="toggle-twitter" onclick="toggleSocial('twitter')" title="Connect Twitter/X"></div>
+                    <div class="social-status">Coming soon</div>
                 </div>
                 <div class="social-card">
                     <div class="social-icon">📘</div>
                     <div class="social-name">Facebook</div>
-                    <div class="social-status">Not connected</div>
-                    <div class="toggle" id="toggle-facebook" onclick="toggleSocial('facebook')" title="Connect Facebook"></div>
+                    <div class="social-status">Coming soon</div>
                 </div>
                 <div class="social-card">
                     <div class="social-icon">📸</div>
                     <div class="social-name">Instagram</div>
-                    <div class="social-status">Not connected</div>
-                    <div class="toggle" id="toggle-instagram" onclick="toggleSocial('instagram')" title="Connect Instagram"></div>
+                    <div class="social-status">Coming soon</div>
                 </div>
                 <div class="social-card">
                     <div class="social-icon">🎵</div>
                     <div class="social-name">TikTok</div>
-                    <div class="social-status">Not connected</div>
-                    <div class="toggle" id="toggle-tiktok" onclick="toggleSocial('tiktok')" title="Connect TikTok"></div>
+                    <div class="social-status">Coming soon</div>
                 </div>
                 <div class="social-card">
                     <div class="social-icon">▶️</div>
                     <div class="social-name">YouTube</div>
-                    <div class="social-status">Not connected</div>
-                    <div class="toggle" id="toggle-youtube" onclick="toggleSocial('youtube')" title="Connect YouTube"></div>
+                    <div class="social-status">Coming soon</div>
                 </div>
             </div>
         </div>
@@ -1008,23 +1003,68 @@
     });
 
     // ── Social toggles ────────────────────────────────────────────────────────
-    const socialState = JSON.parse(localStorage.getItem('social_state') || '{}');
+    const BACKEND = 'https://digicards-api.fly.dev';
 
-    function initSocialToggles() {
-        ['linkedin','twitter','facebook','instagram','tiktok','youtube'].forEach(ch => {
-            if (socialState[ch]) document.getElementById(`toggle-${ch}`).classList.add('on');
+    // ── LinkedIn OAuth ────────────────────────────────────────────────────────
+    function connectLinkedIn() {
+        // Store JWT so callback page can use it
+        const jwt = localStorage.getItem('auth_token');
+        if (!jwt) { showToast('Sign in to DigiCards first to connect LinkedIn', 'error'); return; }
+        localStorage.setItem('linkedin_connect_jwt', jwt);
+        window.location.href = `${BACKEND}/integrations/linkedin/connect?token=${encodeURIComponent(jwt)}`;
+    }
+
+    function disconnectLinkedIn() {
+        const jwt = localStorage.getItem('auth_token');
+        if (!jwt) return;
+        fetch(`${BACKEND}/integrations/linkedin/disconnect`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${jwt}` }
+        }).then(() => {
+            localStorage.removeItem('linkedin_connected');
+            localStorage.removeItem('linkedin_name');
+            updateLinkedInUI(false, null);
+            showToast('LinkedIn disconnected');
         });
     }
 
-    function toggleSocial(channel) {
-        const el = document.getElementById(`toggle-${channel}`);
-        const isOn = el.classList.toggle('on');
-        socialState[channel] = isOn;
-        localStorage.setItem('social_state', JSON.stringify(socialState));
-        showToast(
-            isOn ? `${channel} enabled — connect API keys to activate posting` : `${channel} disabled`,
-            isOn ? 'success' : 'success'
-        );
+    function updateLinkedInUI(connected, name) {
+        const status = document.getElementById('linkedin-status');
+        const btn = document.getElementById('linkedin-btn');
+        if (connected) {
+            status.textContent = `Connected as ${name || 'LinkedIn'}`;
+            status.style.color = '#10b981';
+            btn.textContent = 'Disconnect';
+            btn.style.borderColor = '#ef4444';
+            btn.style.color = '#ef4444';
+            btn.onclick = disconnectLinkedIn;
+        } else {
+            status.textContent = 'Not connected';
+            status.style.color = '';
+            btn.textContent = 'Connect';
+            btn.style.borderColor = '#0a66c2';
+            btn.style.color = '#0a66c2';
+            btn.onclick = connectLinkedIn;
+        }
+    }
+
+    function initLinkedIn() {
+        // Check URL params for OAuth callback result
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('linkedin') === 'success') {
+            const name = params.get('name') || 'LinkedIn';
+            localStorage.setItem('linkedin_connected', '1');
+            localStorage.setItem('linkedin_name', name);
+            showToast(`LinkedIn connected as ${name}!`);
+            window.history.replaceState({}, '', window.location.pathname);
+        } else if (params.get('linkedin') === 'error') {
+            showToast('LinkedIn connection failed — try again', 'error');
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+        // Restore state from localStorage
+        if (localStorage.getItem('linkedin_connected')) {
+            updateLinkedInUI(true, localStorage.getItem('linkedin_name'));
+        }
     }
 
     // ── Toast ─────────────────────────────────────────────────────────────────
@@ -1091,7 +1131,7 @@
     if (token) {
         showApp();
     }
-    initSocialToggles();
+    initLinkedIn();
 </script>
 
 </body>
