@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ops Dashboard — DigiCards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="logo/favicon.png">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #0d0f14;
+            --bg2:       #13161e;
+            --bg3:       #1a1d27;
+            --border:    rgba(255,255,255,0.07);
+            --text:      #f1f5f9;
+            --muted:     #64748b;
+            --green:     #22c55e;
+            --yellow:    #f59e0b;
+            --red:       #ef4444;
+            --blue:      #3b82f6;
+            --sky:       #0ea5e9;
+            --indigo:    #6366f1;
+            --purple:    #8b5cf6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── Lock screen ── */
+        #lock-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .lock-box {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 36px;
+            width: 360px;
+            text-align: center;
+        }
+        .lock-box .lock-icon { font-size: 2rem; margin-bottom: 16px; }
+        .lock-box h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 6px; }
+        .lock-box p { color: var(--muted); font-size: 0.875rem; margin-bottom: 24px; }
+        .lock-input {
+            width: 100%; padding: 12px 16px;
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 10px; color: var(--text); font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            outline: none; margin-bottom: 12px;
+        }
+        .lock-input:focus { border-color: var(--indigo); }
+        .lock-btn {
+            width: 100%; padding: 12px;
+            background: var(--indigo); color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 0.95rem; font-weight: 600; cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .lock-btn:hover { opacity: 0.88; }
+        .lock-error { color: var(--red); font-size: 0.8rem; margin-top: 8px; display: none; }
+
+        /* ── Layout ── */
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg2);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-logo { font-size: 1.1rem; font-weight: 800; }
+        .topbar-sub { color: var(--muted); font-size: 0.8rem; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .last-updated { color: var(--muted); font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; }
+        .refresh-btn {
+            padding: 7px 14px; background: var(--bg3);
+            border: 1px solid var(--border); border-radius: 8px;
+            color: var(--text); font-size: 0.8rem; cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .refresh-btn:hover { border-color: var(--indigo); }
+
+        .main { padding: 32px; max-width: 1400px; margin: 0 auto; }
+
+        /* ── Summary bar ── */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .summary-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+        }
+        .summary-label { color: var(--muted); font-size: 0.78rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .summary-value { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+        .summary-value.green  { color: var(--green); }
+        .summary-value.yellow { color: var(--yellow); }
+        .summary-value.red    { color: var(--red); }
+
+        /* ── Section headers ── */
+        .section-title {
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; color: var(--muted);
+            margin-bottom: 12px; margin-top: 32px;
+        }
+
+        /* ── Service grid ── */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+        }
+
+        .service-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: border-color 0.2s;
+        }
+        .service-card:hover { border-color: rgba(255,255,255,0.14); }
+
+        .service-header {
+            display: flex; align-items: flex-start; justify-content: space-between;
+        }
+        .service-name-row { display: flex; align-items: center; gap: 10px; }
+        .service-icon {
+            width: 36px; height: 36px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .service-name { font-weight: 700; font-size: 0.95rem; }
+        .service-type { color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
+
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+        }
+        .status-pill .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+        .pill-green  { background: rgba(34,197,94,.12);  color: var(--green); }
+        .pill-green .dot  { background: var(--green); animation: pulse 2s infinite; }
+        .pill-yellow { background: rgba(245,158,11,.12); color: var(--yellow); }
+        .pill-yellow .dot { background: var(--yellow); }
+        .pill-red    { background: rgba(239,68,68,.12);  color: var(--red); }
+        .pill-red .dot    { background: var(--red); }
+        .pill-blue   { background: rgba(59,130,246,.12); color: var(--blue); }
+        .pill-blue .dot   { background: var(--blue); }
+
+        @keyframes pulse {
+            0%,100% { opacity: 1; }
+            50%      { opacity: 0.4; }
+        }
+
+        .service-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .meta-item { display: flex; flex-direction: column; gap: 2px; }
+        .meta-label { font-size: 0.7rem; color: var(--muted); }
+        .meta-value { font-size: 0.82rem; font-weight: 500; font-family: 'JetBrains Mono', monospace; }
+        .meta-value a { color: var(--sky); text-decoration: none; }
+        .meta-value a:hover { text-decoration: underline; }
+
+        .service-cost {
+            display: flex; align-items: center; justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .cost-label { color: var(--muted); font-size: 0.75rem; }
+        .cost-value { font-size: 0.9rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .cost-free { color: var(--green); }
+        .cost-paid { color: var(--yellow); }
+
+        /* ── Cost table ── */
+        .cost-table {
+            width: 100%;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .cost-table table { width: 100%; border-collapse: collapse; }
+        .cost-table th {
+            text-align: left; padding: 12px 20px;
+            font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+        .cost-table td {
+            padding: 13px 20px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .cost-table tr:last-child td { border-bottom: none; }
+        .cost-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .cost-table .total-row td { font-weight: 700; background: rgba(255,255,255,0.03); }
+        .tag {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 4px; font-size: 0.7rem; font-weight: 600;
+        }
+        .tag-free  { background: rgba(34,197,94,.12);  color: var(--green); }
+        .tag-paid  { background: rgba(245,158,11,.12); color: var(--yellow); }
+        .tag-plan  { background: rgba(99,102,241,.12); color: var(--indigo); }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .summary-bar { grid-template-columns: repeat(2,1fr); }
+            .main { padding: 20px 16px; }
+            .topbar { padding: 16px; }
+        }
+        @media (max-width: 560px) {
+            .summary-bar { grid-template-columns: 1fr 1fr; }
+            .service-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Lock Screen -->
+<div id="lock-screen">
+    <div class="lock-box">
+        <div class="lock-icon">🔐</div>
+        <h2>Ops Dashboard</h2>
+        <p>DigiCards internal — enter password to continue</p>
+        <input type="password" class="lock-input" id="lock-input" placeholder="Password" autocomplete="current-password">
+        <button class="lock-btn" id="lock-btn">Unlock</button>
+        <div class="lock-error" id="lock-error">Incorrect password</div>
+    </div>
+</div>
+
+<!-- Main Dashboard -->
+<div id="dashboard" style="display:none;">
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <img src="logo/app-icon.png" width="28" height="28" style="border-radius:6px;">
+            <div>
+                <div class="topbar-logo">DigiCards Ops</div>
+                <div class="topbar-sub">Infrastructure overview — Fahad only</div>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <span class="last-updated" id="last-updated">—</span>
+            <button class="refresh-btn" onclick="checkAll()">↻ Refresh</button>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <!-- Summary bar -->
+        <div class="summary-bar">
+            <div class="summary-card">
+                <div class="summary-label">Services</div>
+                <div class="summary-value" id="sum-total">—</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Live</div>
+                <div class="summary-value green" id="sum-live">—</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Needs attention</div>
+                <div class="summary-value yellow" id="sum-warn">—</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Est. monthly cost</div>
+                <div class="summary-value" id="sum-cost">—</div>
+            </div>
+        </div>
+
+        <!-- ── Backend & API ── -->
+        <div class="section-title">Backend & API</div>
+        <div class="service-grid">
+
+            <div class="service-card" id="card-flyio">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(99,102,241,.15);">🚀</div>
+                        <div>
+                            <div class="service-name">DigiCards API</div>
+                            <div class="service-type">Fly.io · FastAPI · Toronto (yyz)</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green" id="status-flyio"><span class="dot"></span>Checking…</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">URL</span>
+                        <span class="meta-value"><a href="https://digicards-api.fly.dev" target="_blank">digicards-api.fly.dev</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">App</span>
+                        <span class="meta-value">digicards-api</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Region</span>
+                        <span class="meta-value">yyz — Toronto</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Deploy</span>
+                        <span class="meta-value">flyctl deploy</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Fly.io shared-cpu-1x · 256MB</span>
+                    <span class="cost-value cost-paid">~$5/mo</span>
+                </div>
+            </div>
+
+            <div class="service-card" id="card-supabase">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(34,197,94,.15);">🗄️</div>
+                        <div>
+                            <div class="service-name">Supabase</div>
+                            <div class="service-type">PostgreSQL + Storage · Free tier</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green"><span class="dot"></span>Live</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Dashboard</span>
+                        <span class="meta-value"><a href="https://supabase.com/dashboard" target="_blank">supabase.com/dashboard</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Tables</span>
+                        <span class="meta-value">users, cards, categories, integrations…</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Storage</span>
+                        <span class="meta-value">Supabase Storage (card images)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Extras</span>
+                        <span class="meta-value">pg_cron, PostGIS, pgvector</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Free tier (500MB DB, 1GB storage)</span>
+                    <span class="cost-value cost-free">Free</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Website & Pages ── -->
+        <div class="section-title">Website & Pages</div>
+        <div class="service-grid">
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(14,165,233,.15);">🌐</div>
+                        <div>
+                            <div class="service-name">digi-cards.app</div>
+                            <div class="service-type">GitHub Pages + Cloudflare CDN</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green" id="status-website"><span class="dot"></span>Checking…</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Repo</span>
+                        <span class="meta-value"><a href="https://github.com/Shahzfah/digicards-website" target="_blank">Shahzfah/digicards-website</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Deploy</span>
+                        <span class="meta-value">git push origin main</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">DNS</span>
+                        <span class="meta-value">Cloudflare (proxy on)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Pages live</span>
+                        <span class="meta-value">index, outreachos, blog, dashboard, ops</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">GitHub Pages + Cloudflare Free</span>
+                    <span class="cost-value cost-free">Free</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(245,158,11,.15);">📊</div>
+                        <div>
+                            <div class="service-name">OutreachOS Dashboard</div>
+                            <div class="service-type">digi-cards.app/dashboard.html</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green"><span class="dot"></span>Live</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">URL</span>
+                        <span class="meta-value"><a href="/dashboard.html" target="_blank">digi-cards.app/dashboard.html</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Password</span>
+                        <span class="meta-value">outreachos2026</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Trigger server</span>
+                        <span class="meta-value" id="trigger-location">localhost:9090</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Quick actions</span>
+                        <span class="meta-value" id="trigger-status">—</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Static page — no hosting cost</span>
+                    <span class="cost-value cost-free">Free</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Marketing Automation ── -->
+        <div class="section-title">Marketing Automation (OutreachOS)</div>
+        <div class="service-grid">
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(139,92,246,.15);">⚙️</div>
+                        <div>
+                            <div class="service-name">Scheduler</div>
+                            <div class="service-type">scheduler.py · cron-based orchestrator</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-yellow" id="status-scheduler"><span class="dot"></span>Local only</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Location</span>
+                        <span class="meta-value" id="scheduler-location">This machine</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Log</span>
+                        <span class="meta-value">logs/scheduler.log</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Blog gen</span>
+                        <span class="meta-value">Monday 09:00</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Outreach</span>
+                        <span class="meta-value">Mon–Fri 08:00</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label" id="scheduler-cost-label">⚠️ Needs DigitalOcean droplet</span>
+                    <span class="cost-value cost-paid" id="scheduler-cost">$5/mo planned</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(14,165,233,.15);">📬</div>
+                        <div>
+                            <div class="service-name">Resend</div>
+                            <div class="service-type">Email delivery · digi-cards.app domain</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green"><span class="dot"></span>Live</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">From</span>
+                        <span class="meta-value">fahad@digi-cards.app</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Dashboard</span>
+                        <span class="meta-value"><a href="https://resend.com" target="_blank">resend.com</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Free limits</span>
+                        <span class="meta-value">100/day · 3,000/mo</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Domain</span>
+                        <span class="meta-value">digi-cards.app ✓ verified</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Free tier (well within limits)</span>
+                    <span class="cost-value cost-free">Free</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(34,197,94,.15);">🤖</div>
+                        <div>
+                            <div class="service-name">OpenAI</div>
+                            <div class="service-type">GPT-4o-mini · blog content generation</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green"><span class="dot"></span>Live</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Model</span>
+                        <span class="meta-value">gpt-4o-mini</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Usage</span>
+                        <span class="meta-value">1 blog post/week</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Dashboard</span>
+                        <span class="meta-value"><a href="https://platform.openai.com" target="_blank">platform.openai.com</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Est. usage</span>
+                        <span class="meta-value">~4 posts/mo</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">gpt-4o-mini · ~1,500 tokens/post</span>
+                    <span class="cost-value cost-free">&lt;$1/mo</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(14,165,233,.15);">💼</div>
+                        <div>
+                            <div class="service-name">LinkedIn API</div>
+                            <div class="service-type">social_media_poster.py · auto-post</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green"><span class="dot"></span>Live</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">App</span>
+                        <span class="meta-value">OutreachOS (Client ID: 8628jjmg…)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Products</span>
+                        <span class="meta-value">Share on LinkedIn + OpenID</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Posts from</span>
+                        <span class="meta-value">Personal profile (65% reach)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Auto-comment</span>
+                        <span class="meta-value">Blog URL (avoids 42% penalty)</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">LinkedIn API free tier</span>
+                    <span class="cost-value cost-free">Free</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Mobile Apps ── -->
+        <div class="section-title">Mobile Apps</div>
+        <div class="service-grid">
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(34,197,94,.15);">🤖</div>
+                        <div>
+                            <div class="service-name">Android — Google Play</div>
+                            <div class="service-type">com.digicards.app · v2.0.1 (build 20)</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green"><span class="dot"></span>Live in production</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Store</span>
+                        <span class="meta-value"><a href="https://play.google.com/store/apps/details?id=com.digicards.app" target="_blank">Google Play</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Console</span>
+                        <span class="meta-value"><a href="https://play.google.com/console" target="_blank">play.google.com/console</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">RevenueCat key</span>
+                        <span class="meta-value">goog_qPbnIq…</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">IAP</span>
+                        <span class="meta-value">digicards_premium_v2 · $9.99 CAD/mo</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Google Play developer ($25 one-time paid)</span>
+                    <span class="cost-value cost-free">$0/mo</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(99,102,241,.15);">🍎</div>
+                        <div>
+                            <div class="service-name">iOS — App Store</div>
+                            <div class="service-type">com.digicards.app · v2.0.1 (build 2)</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-yellow"><span class="dot"></span>In Apple review</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Submitted</span>
+                        <span class="meta-value">Jun 12 2026 (build 2)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Submission ID</span>
+                        <span class="meta-value">863baced-b011…</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">RevenueCat key</span>
+                        <span class="meta-value">appl_tguIpRF…</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Console</span>
+                        <span class="meta-value"><a href="https://appstoreconnect.apple.com" target="_blank">appstoreconnect.apple.com</a></span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Apple Developer Program</span>
+                    <span class="cost-value cost-paid">$99/yr</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(245,158,11,.15);">💳</div>
+                        <div>
+                            <div class="service-name">RevenueCat</div>
+                            <div class="service-type">Subscription management · iOS + Android</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green"><span class="dot"></span>Live (Android)</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Dashboard</span>
+                        <span class="meta-value"><a href="https://app.revenuecat.com" target="_blank">app.revenuecat.com</a></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Project</span>
+                        <span class="meta-value">DigiCards</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Product</span>
+                        <span class="meta-value">digicards_premium_v2</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Webhook</span>
+                        <span class="meta-value">digicards-api.fly.dev/webhooks/…</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Free up to $2,500 MTR</span>
+                    <span class="cost-value cost-free">Free</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Third-party integrations ── -->
+        <div class="section-title">Third-Party Integrations</div>
+        <div class="service-grid">
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(245,158,11,.15);">🔶</div>
+                        <div>
+                            <div class="service-name">HubSpot</div>
+                            <div class="service-type">CRM sync · OAuth integration</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-yellow"><span class="dot"></span>Live, unverified</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Callback</span>
+                        <span class="meta-value">digicards-api.fly.dev/integrations/hubspot/callback</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Scopes</span>
+                        <span class="meta-value">contacts.read + contacts.write</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Marketplace</span>
+                        <span class="meta-value">⚠️ Submission pending</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Docs</span>
+                        <span class="meta-value">docs/app-verification/hubspot-listing.md</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">HubSpot developer app — free</span>
+                    <span class="cost-value cost-free">Free</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(59,130,246,.15);">📇</div>
+                        <div>
+                            <div class="service-name">Google Contacts</div>
+                            <div class="service-type">OAuth · contacts scope (sensitive)</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-yellow"><span class="dot"></span>Live, unverified</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Scope</span>
+                        <span class="meta-value">contacts (SENSITIVE)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Needs</span>
+                        <span class="meta-value">⚠️ Demo video for Google review</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Callback</span>
+                        <span class="meta-value">digicards-api.fly.dev/integrations/google/callback</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Console</span>
+                        <span class="meta-value"><a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a></span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Google Cloud free tier (OAuth only)</span>
+                    <span class="cost-value cost-free">Free</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-name-row">
+                        <div class="service-icon" style="background:rgba(99,102,241,.15);">👁️</div>
+                        <div>
+                            <div class="service-name">Google Vision OCR</div>
+                            <div class="service-type">Cloud Vision API · card text extraction</div>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-green"><span class="dot"></span>Live</span>
+                </div>
+                <div class="service-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">API</span>
+                        <span class="meta-value">Cloud Vision v1</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Free tier</span>
+                        <span class="meta-value">1,000 units/mo free</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Credentials</span>
+                        <span class="meta-value">backend/google-credentials.json</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Batch support</span>
+                        <span class="meta-value">Up to 16 images/request</span>
+                    </div>
+                </div>
+                <div class="service-cost">
+                    <span class="cost-label">Free up to 1,000 scans/mo</span>
+                    <span class="cost-value cost-free">Free*</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Monthly Cost Summary ── -->
+        <div class="section-title">Monthly Cost Breakdown</div>
+        <div class="cost-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Plan</th>
+                        <th>Cost</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Fly.io (Backend API)</td>
+                        <td><span class="tag tag-plan">shared-cpu-1x</span></td>
+                        <td>~$5/mo</td>
+                        <td>256MB RAM · Toronto</td>
+                    </tr>
+                    <tr>
+                        <td>Apple Developer</td>
+                        <td><span class="tag tag-plan">Annual</span></td>
+                        <td>$8.25/mo</td>
+                        <td>$99/yr billed annually</td>
+                    </tr>
+                    <tr>
+                        <td>DigitalOcean Droplet</td>
+                        <td><span class="tag tag-plan">Basic</span></td>
+                        <td>$5/mo <span style="color:var(--yellow);font-size:0.7rem;">planned</span></td>
+                        <td>Scheduler + trigger server</td>
+                    </tr>
+                    <tr>
+                        <td>OpenAI</td>
+                        <td><span class="tag tag-plan">Pay-as-you-go</span></td>
+                        <td>&lt;$1/mo</td>
+                        <td>gpt-4o-mini, ~4 posts/mo</td>
+                    </tr>
+                    <tr>
+                        <td>Supabase</td>
+                        <td><span class="tag tag-free">Free</span></td>
+                        <td>$0</td>
+                        <td>500MB DB · 1GB storage</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub Pages</td>
+                        <td><span class="tag tag-free">Free</span></td>
+                        <td>$0</td>
+                        <td>Static hosting</td>
+                    </tr>
+                    <tr>
+                        <td>Cloudflare</td>
+                        <td><span class="tag tag-free">Free</span></td>
+                        <td>$0</td>
+                        <td>CDN + DNS</td>
+                    </tr>
+                    <tr>
+                        <td>Resend</td>
+                        <td><span class="tag tag-free">Free</span></td>
+                        <td>$0</td>
+                        <td>100/day · 3,000/mo</td>
+                    </tr>
+                    <tr>
+                        <td>RevenueCat</td>
+                        <td><span class="tag tag-free">Free</span></td>
+                        <td>$0</td>
+                        <td>Free up to $2,500 MTR</td>
+                    </tr>
+                    <tr>
+                        <td>LinkedIn API</td>
+                        <td><span class="tag tag-free">Free</span></td>
+                        <td>$0</td>
+                        <td>Share on LinkedIn product</td>
+                    </tr>
+                    <tr>
+                        <td>Google Vision OCR</td>
+                        <td><span class="tag tag-free">Free*</span></td>
+                        <td>$0</td>
+                        <td>1,000 free units/mo</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>Total</strong></td>
+                        <td></td>
+                        <td><strong>~$19/mo</strong></td>
+                        <td>($14/mo current · +$5 after droplet)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── Pending actions ── -->
+        <div class="section-title">Pending Actions</div>
+        <div class="service-grid">
+            <div class="service-card" style="border-color:rgba(245,158,11,0.3);">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-size:0.8rem;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.05em;">🔴 Urgent</div>
+                    <div style="display:flex;flex-direction:column;gap:8px;font-size:0.875rem;color:var(--muted);">
+                        <div>⏳ <strong style="color:var(--text);">iOS App Store</strong> — awaiting Apple approval (submitted Jun 12)</div>
+                        <div>📞 <strong style="color:var(--text);">3 real broker testimonials</strong> — #1 conversion blocker on outreachos.html</div>
+                        <div>🎥 <strong style="color:var(--text);">90-second demo video</strong> — embed above fold on outreachos.html</div>
+                    </div>
+                </div>
+            </div>
+            <div class="service-card" style="border-color:rgba(99,102,241,0.3);">
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-size:0.8rem;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:.05em;">🟡 Next</div>
+                    <div style="display:flex;flex-direction:column;gap:8px;font-size:0.875rem;color:var(--muted);">
+                        <div>🌊 <strong style="color:var(--text);">DigitalOcean droplet</strong> — move scheduler off local machine ($5/mo)</div>
+                        <div>📋 <strong style="color:var(--text);">Populate brokerages.csv</strong> — 50–100 real contacts (after iOS confirmed)</div>
+                        <div>🔶 <strong style="color:var(--text);">HubSpot marketplace listing</strong> — submit for verification</div>
+                        <div>🔍 <strong style="color:var(--text);">Google OAuth verification</strong> — needs demo video first</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="height:48px;"></div>
+
+    </div><!-- /main -->
+</div><!-- /dashboard -->
+
+<script>
+    // ── Auth ──
+    const PASSWORD = 'ops2026';
+    const lock = document.getElementById('lock-screen');
+    const dash = document.getElementById('dashboard');
+    const lockInput = document.getElementById('lock-input');
+    const lockBtn = document.getElementById('lock-btn');
+    const lockError = document.getElementById('lock-error');
+
+    function tryUnlock() {
+        if (lockInput.value === PASSWORD) {
+            lock.style.display = 'none';
+            dash.style.display = 'block';
+            sessionStorage.setItem('ops_auth', '1');
+            checkAll();
+        } else {
+            lockError.style.display = 'block';
+            lockInput.value = '';
+            lockInput.focus();
+        }
+    }
+
+    lockBtn.addEventListener('click', tryUnlock);
+    lockInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+
+    if (sessionStorage.getItem('ops_auth') === '1') {
+        lock.style.display = 'none';
+        dash.style.display = 'block';
+    }
+
+    // ── Health checks ──
+    async function ping(url, timeout = 6000) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), timeout);
+        try {
+            const r = await fetch(url, { signal: ctrl.signal, mode: 'no-cors' });
+            clearTimeout(timer);
+            return true;
+        } catch {
+            clearTimeout(timer);
+            return false;
+        }
+    }
+
+    function setStatus(id, ok, label) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.className = 'status-pill ' + (ok ? 'pill-green' : 'pill-red');
+        el.innerHTML = `<span class="dot"></span>${label}`;
+    }
+
+    async function checkAll() {
+        document.getElementById('last-updated').textContent = 'Checking… ' + new Date().toLocaleTimeString();
+
+        // Fly.io API
+        const apiOk = await ping('https://digicards-api.fly.dev/health');
+        setStatus('status-flyio', apiOk, apiOk ? 'Live' : 'Unreachable');
+
+        // Website
+        const webOk = await ping('https://digi-cards.app');
+        setStatus('status-website', webOk, webOk ? 'Live' : 'Unreachable');
+
+        // Trigger server (localhost — will fail from remote, that's expected)
+        const triggerOk = await ping('http://localhost:9090/health', 2000);
+        document.getElementById('trigger-status').textContent = triggerOk ? '✓ Running locally' : '✗ Offline (move to droplet)';
+        document.getElementById('trigger-status').style.color = triggerOk ? 'var(--green)' : 'var(--yellow)';
+
+        // Summary counts
+        const cards = document.querySelectorAll('.service-card');
+        const live = document.querySelectorAll('.pill-green').length;
+        const warn = document.querySelectorAll('.pill-yellow').length;
+        const totalCost = 19; // ~$19/mo
+
+        document.getElementById('sum-total').textContent = cards.length;
+        document.getElementById('sum-live').textContent = live;
+        document.getElementById('sum-warn').textContent = warn;
+        document.getElementById('sum-cost').textContent = '~$' + totalCost + '/mo';
+
+        document.getElementById('last-updated').textContent = 'Last checked: ' + new Date().toLocaleTimeString();
+    }
+</script>
+</body>
+</html>
