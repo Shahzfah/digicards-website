@@ -425,7 +425,7 @@
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">Trigger server</span>
-                        <span class="meta-value" id="trigger-location">localhost:9090</span>
+                        <span class="meta-value" id="trigger-location">143.198.47.59:9090</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">Quick actions</span>
@@ -453,12 +453,12 @@
                             <div class="service-type">scheduler.py · cron-based orchestrator</div>
                         </div>
                     </div>
-                    <span class="status-pill pill-yellow" id="status-scheduler"><span class="dot"></span>Local only</span>
+                    <span class="status-pill pill-yellow" id="status-scheduler"><span class="dot"></span>Live on droplet</span>
                 </div>
                 <div class="service-meta">
                     <div class="meta-item">
                         <span class="meta-label">Location</span>
-                        <span class="meta-value" id="scheduler-location">This machine</span>
+                        <span class="meta-value" id="scheduler-location">DigitalOcean · Toronto · 143.198.47.59</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">Log</span>
@@ -474,8 +474,8 @@
                     </div>
                 </div>
                 <div class="service-cost">
-                    <span class="cost-label" id="scheduler-cost-label">⚠️ Needs DigitalOcean droplet</span>
-                    <span class="cost-value cost-paid" id="scheduler-cost">$5/mo planned</span>
+                    <span class="cost-label" id="scheduler-cost-label">&#x2705; Running on DigitalOcean droplet</span>
+                    <span class="cost-value cost-paid" id="scheduler-cost">$6/mo</span>
                 </div>
             </div>
 
@@ -991,7 +991,7 @@
         setStatus('status-website', webOk, webOk ? 'Live' : 'Unreachable');
 
         // Trigger server (localhost — will fail from remote, that's expected)
-        const triggerOk = await ping('http://localhost:9090/health', 2000);
+        const triggerOk = await ping('http://143.198.47.59:9090/health', 2000);
         document.getElementById('trigger-status').textContent = triggerOk ? '✓ Running locally' : '✗ Offline (move to droplet)';
         document.getElementById('trigger-status').style.color = triggerOk ? 'var(--green)' : 'var(--yellow)';
 
