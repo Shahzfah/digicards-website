@@ -1007,19 +1007,15 @@
 
     // ── LinkedIn OAuth ────────────────────────────────────────────────────────
     function connectLinkedIn() {
-        // Store JWT so callback page can use it
-        const jwt = localStorage.getItem('auth_token');
-        if (!jwt) { showToast('Sign in to DigiCards first to connect LinkedIn', 'error'); return; }
-        localStorage.setItem('linkedin_connect_jwt', jwt);
-        window.location.href = `${BACKEND}/integrations/linkedin/connect?token=${encodeURIComponent(jwt)}`;
+        const pw = localStorage.getItem('dashboard_token') || 'outreachos2026';
+        window.location.href = `${BACKEND}/integrations/linkedin/connect?dashboard_token=${encodeURIComponent(pw)}`;
     }
 
     function disconnectLinkedIn() {
-        const jwt = localStorage.getItem('auth_token');
-        if (!jwt) return;
+        const pw = localStorage.getItem('dashboard_token') || 'outreachos2026';
         fetch(`${BACKEND}/integrations/linkedin/disconnect`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${jwt}` }
+            headers: { 'x-dashboard-password': pw }
         }).then(() => {
             localStorage.removeItem('linkedin_connected');
             localStorage.removeItem('linkedin_name');
