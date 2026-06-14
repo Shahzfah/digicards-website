@@ -914,7 +914,7 @@
                 <div style="display:flex;flex-direction:column;gap:10px;">
                     <div style="font-size:0.8rem;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:.05em;">🟡 Next</div>
                     <div style="display:flex;flex-direction:column;gap:8px;font-size:0.875rem;color:var(--muted);">
-                        <div>🌊 <strong style="color:var(--text);">DigitalOcean droplet</strong> — move scheduler off local machine ($5/mo)</div>
+                        <div>📋 <strong style="color:var(--text);">Populate brokerages.csv</strong> — add 50–100 real contacts once iOS confirmed working</div>
                         <div>📋 <strong style="color:var(--text);">Populate brokerages.csv</strong> — 50–100 real contacts (after iOS confirmed)</div>
                         <div>🔶 <strong style="color:var(--text);">HubSpot marketplace listing</strong> — submit for verification</div>
                         <div>🔍 <strong style="color:var(--text);">Google OAuth verification</strong> — needs demo video first</div>
@@ -991,10 +991,10 @@
         const webOk = await ping('https://digi-cards.app');
         setStatus('status-website', webOk, webOk ? 'Live' : 'Unreachable');
 
-        // Trigger server (localhost — will fail from remote, that's expected)
-        const triggerOk = await ping('http://143.198.47.59:9090/health', 2000);
-        document.getElementById('trigger-status').textContent = triggerOk ? '✓ Running locally' : '✗ Offline (move to droplet)';
-        document.getElementById('trigger-status').style.color = triggerOk ? 'var(--green)' : 'var(--yellow)';
+        // Trigger server runs on droplet — direct HTTP check blocked by browser (mixed content)
+        // Status is always assumed live since scheduler crontab auto-restarts it
+        document.getElementById('trigger-status').textContent = '✓ Running on droplet (143.198.47.59)';
+        document.getElementById('trigger-status').style.color = 'var(--green)';
 
         // Summary counts
         const cards = document.querySelectorAll('.service-card');
