@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conference Networking Tips: Before, During, After - DigiCards Blog</title>
+    <meta name="description" content="# Conference Networking Tips: Before, During, After  Networking at conferences can be a game-changer for sales professionals, entrepreneurs, and real estate age">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" type="image/png" href="../logo/favicon.png">
+    <style>
+        /* ── Blog post page styles ── */
+        .blog-post-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 14px 0;
+        }
+        .blog-post-nav .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .blog-post-nav .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #111827;
+        }
+        .blog-post-nav .logo img {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+        }
+        .blog-post-nav .nav-links {
+            display: flex;
+            gap: 28px;
+        }
+        .blog-post-nav .nav-links a {
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .blog-post-nav .nav-links a:hover { color: #6366f1; }
+        .blog-post-nav .btn-nav {
+            padding: 9px 20px;
+            background: #6366f1;
+            color: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .blog-post-nav .btn-nav:hover { opacity: 0.88; }
+
+        .blog-article {
+            padding: 110px 0 80px;
+            background: #ffffff;
+        }
+        .blog-article .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .blog-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #6366f1;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 36px;
+            transition: gap 0.2s;
+        }
+        .blog-back:hover { gap: 12px; }
+        .blog-header {
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .blog-header .post-date {
+            display: inline-block;
+            color: #6366f1;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .blog-header h1 {
+            font-size: 2.6rem;
+            line-height: 1.2;
+            color: #111827;
+            margin: 0 0 20px 0;
+            font-weight: 800;
+        }
+        .blog-header .post-author {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        /* ── Article body typography ── */
+        .blog-content {
+            color: #374151;
+            font-size: 1.1rem;
+            line-height: 1.85;
+        }
+        .blog-content h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 52px 0 20px;
+            line-height: 1.3;
+        }
+        .blog-content h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 36px 0 14px;
+            line-height: 1.4;
+        }
+        .blog-content p {
+            margin: 0 0 24px;
+        }
+        .blog-content ul, .blog-content ol {
+            margin: 8px 0 28px;
+            padding-left: 28px;
+        }
+        .blog-content li {
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+        .blog-content strong {
+            color: #111827;
+            font-weight: 600;
+        }
+        .blog-content a {
+            color: #6366f1;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .blog-content a:hover { opacity: 0.8; }
+        .blog-content blockquote {
+            border-left: 4px solid #6366f1;
+            padding: 12px 20px;
+            margin: 28px 0;
+            background: #f5f3ff;
+            border-radius: 0 8px 8px 0;
+            color: #4b5563;
+            font-style: italic;
+        }
+
+        /* ── CTA ── */
+        .blog-cta {
+            margin-top: 64px;
+            padding: 44px 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 16px;
+            text-align: center;
+        }
+        .blog-cta h3 {
+            color: white;
+            font-size: 1.6rem;
+            margin: 0 0 12px;
+        }
+        .blog-cta p {
+            color: rgba(255,255,255,0.85);
+            margin: 0 0 24px;
+            font-size: 1rem;
+        }
+        .blog-cta .cta-btn {
+            display: inline-block;
+            padding: 13px 28px;
+            background: white;
+            color: #6366f1;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .blog-cta .cta-btn:hover { opacity: 0.9; }
+
+        @media (max-width: 640px) {
+            .blog-header h1 { font-size: 1.9rem; }
+            .blog-post-nav .nav-links { display: none; }
+            .blog-content { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation — always visible, never overlaps content -->
+    <nav class="blog-post-nav">
+        <div class="container nav-container">
+            <a href="../index.html" class="logo">
+                <img src="../logo/app-icon.png" alt="DigiCards">
+                <span>DigiCards</span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html#features">Features</a>
+                <a href="../index.html#how-it-works">How it Works</a>
+                <a href="../index.html#pricing">Pricing</a>
+                <a href="../blog.html">Blog</a>
+            </div>
+            <a href="../index.html#download" class="btn-nav">Get the App</a>
+        </div>
+    </nav>
+
+    <!-- Blog Post -->
+    <article class="blog-article">
+        <div class="container">
+            <a href="../blog.html" class="blog-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Blog
+            </a>
+
+            <header class="blog-header">
+                <span class="post-date">2026-06-15</span>
+                <h1>Conference Networking Tips: Before, During, After</h1>
+                <p class="post-author">By DigiCards Team</p>
+            </header>
+
+            <div class="blog-content">
+                <h1>Conference Networking Tips: Before, During, After</h1>
+<p>Networking at conferences can be a game-changer for sales professionals, entrepreneurs, and real estate agents. The connections you make can lead to valuable partnerships, new clients, and expanded opportunities. However, effective networking requires strategic planning and execution. In this blog post, we'll explore actionable tips to enhance your networking experience at conferences, focusing on what you can do before, during, and after the event. We'll also discuss how DigiCards, a business card scanning app, can streamline your contact management and CRM integration, making the process smoother.</p>
+<h2>Why Networking is Essential</h2>
+<p>Before diving into the tips, let’s consider the importance of networking. According to a study by LinkedIn, 85% of jobs are filled through networking. For sales professionals and entrepreneurs, effective networking can lead to increased sales opportunities and partnerships.</p>
+<p>With the right approach and tools, you can turn every conference into a valuable networking opportunity.</p>
+<h2>Before the Conference</h2>
+<h3>1. Set Clear Goals</h3>
+<p>Before attending a conference, define what you want to achieve. Are you looking for potential clients, partners, or industry insights? Setting clear goals allows you to focus your efforts and measure success.</p>
+<strong>Example:</strong> If you're a real estate agent, your goal might be to connect with at least five potential buyers or investors during the event.
+<h3>2. Research Attendees and Speakers</h3>
+<p>Take the time to know who will be attending and speaking at the conference. Use social media platforms like LinkedIn to find out more about potential connections.</p>
+<strong>Tip:</strong> Make a list of people you’d like to meet and research their backgrounds to better understand how you can approach them.
+<h3>3. Leverage Social Media</h3>
+<p>Engage with the event's social media pages. Comment on posts, share your excitement, and use the event hashtag. This will help you connect with other attendees even before the event starts.</p>
+<strong>Stat:</strong> According to a report by Eventbrite, 80% of event attendees will engage with the event on social media before it takes place.
+<h3>4. Prepare Your Elevator Pitch</h3>
+<p>Your elevator pitch should clearly convey who you are, what you do, and what value you can bring. Keep it concise—ideally under 30 seconds.</p>
+<strong>Example:</strong> "Hi, I’m John, a real estate agent specializing in luxury homes in the downtown area. I help clients find their dream homes while maximizing their investments."
+<h3>5. Get Your Business Cards Ready</h3>
+<p>Even in a digital age, business cards remain essential for networking. Ensure you have enough cards printed and ready to distribute.</p>
+<strong>Tip:</strong> Consider using a business card scanning app like DigiCards to digitize your cards, making it easy to manage contacts later.
+<h2>During the Conference</h2>
+<h3>1. Attend Networking Events</h3>
+<p>Most conferences offer dedicated networking sessions. Attend these events to meet like-minded professionals and make connections in a more relaxed environment.</p>
+<strong>Tip:</strong> Bring a friend or colleague to these events. It can ease the tension and make introductions easier.
+<h3>2. Be Approachable</h3>
+<p>Your body language speaks volumes. Smile, maintain an open posture, and make eye contact. This will make you more approachable and encourage others to engage with you.</p>
+<h3>3. Use a Business Card Scanner</h3>
+<p>As you meet new contacts, use a business card scanning app like DigiCards to quickly scan and store their information. This not only saves time but also reduces the risk of losing physical cards.</p>
+<strong>Stat:</strong> According to a study by the Harvard Business Review, 70% of business cards are lost within a week of being received. By using a business card scanner, you can ensure that you retain that critical information.
+<h3>4. Take Notes</h3>
+<p>After interacting with someone, jot down a few notes about your conversation on their business card or in your app. This will help you remember key details when following up later.</p>
+<h3>5. Engage in Meaningful Conversations</h3>
+<p>Instead of focusing on the quantity of connections, aim for quality. Engage in meaningful conversations and ask open-ended questions that allow the other person to share their insights.</p>
+<strong>Example:</strong> Instead of asking, "What do you do?" try, "What inspired you to get into this industry?"
+<h2>After the Conference</h2>
+<h3>1. Follow Up Promptly</h3>
+<p>Following up is crucial to maintaining the connections you made. Aim to reach out within 48 hours of the conference while the event is still fresh in everyone's mind.</p>
+<strong>Tip:</strong> Use personalized messages referencing your conversation to make your follow-up more impactful.
+<h3>2. Connect on Social Media</h3>
+<p>Send connection requests on LinkedIn to the contacts you met. Include a brief message reminding them of your meeting to increase the chances of acceptance.</p>
+<h3>3. Organize Your Contacts</h3>
+<p>Use a contact management system or CRM integration to organize your new connections. This is where DigiCards shines, allowing you to import scanned contacts directly into your CRM for easy management.</p>
+<strong>Stat:</strong> A study by Salesforce found that 70% of sales professionals say that using a CRM has improved their productivity.
+<h3>4. Schedule Future Meetings</h3>
+<p>If you identified potential collaborations or partnerships, propose scheduling a follow-up meeting to discuss opportunities in more detail.</p>
+<strong>Example:</strong> "I really enjoyed our conversation about market trends. Would you be open to a quick coffee next week to explore this further?"
+<h3>5. Share Valuable Content</h3>
+<p>Keep the conversation going by sharing relevant articles, blog posts, or insights that may interest your new connections. This positions you as a thought leader in your field and keeps you top-of-mind.</p>
+<h2>Conclusion</h2>
+<p>Effective networking at conferences can significantly impact your business and career growth. By setting clear goals, preparing in advance, and utilizing tools like DigiCards for seamless contact management, you can enhance your networking experience.</p>
+<p>DigiCards not only simplifies the process of scanning and managing business cards but also integrates with your CRM to keep your contacts organized and accessible. This means you can focus on what truly matters—building meaningful relationships.</p>
+<p>Are you ready to elevate your networking game? Download DigiCards today and turn your business card chaos into a streamlined networking success story!</p>
+            </div>
+
+            <div class="blog-cta">
+                <h3>Ready to digitize your network?</h3>
+                <p>Start scanning business cards with DigiCards — free on iOS and Android.</p>
+                <a href="../index.html#download" class="cta-btn">Download Now</a>
+            </div>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="../index.html" class="logo">
+                        <img src="../logo/app-icon.png" alt="DigiCards" class="logo-icon" width="36" height="36">
+                        <span class="logo-text">DigiCards</span>
+                    </a>
+                    <p>Smart business card management for the modern professional.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="../index.html#features">Features</a>
+                        <a href="../index.html#pricing">Pricing</a>
+                        <a href="../index.html#download">Download</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <a href="../blog.html">Blog</a>
+                        <a href="../outreachos.html">OutreachOS</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="../privacy.html">Privacy Policy</a>
+                        <a href="../terms.html">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 DigiCards. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
