@@ -189,6 +189,32 @@
         .stat-value.yellow  { color: var(--yellow); }
         .stat-sub { font-size: .8rem; color: var(--text-muted); margin-top: 4px; }
 
+        /* ── Analytics panel ── */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+        .analytic-cell {
+            background: var(--surface);
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .analytic-label { font-size: .75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+        .analytic-value { font-size: 1.75rem; font-weight: 800; color: var(--text); }
+        .analytic-value.up   { color: var(--green); }
+        .analytic-value.mid  { color: var(--accent2); }
+        .analytic-value.warn { color: var(--yellow); }
+        .analytic-sub { font-size: .78rem; color: var(--text-muted); }
+        .analytic-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; }
+        .analytic-bar { height: 4px; border-radius: 2px; background: var(--accent); transition: width .6s ease; }
+
         /* ── Two-column layout ── */
         .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
         @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
@@ -541,10 +567,53 @@
 
     <div class="main">
 
-        <!-- Stats -->
+        <!-- Analytics -->
         <div class="section-header">
-            <div class="section-title">Overview</div>
+            <div class="section-title">Analytics</div>
             <button class="btn-sm btn-ghost" onclick="loadAll()">Refresh</button>
+        </div>
+        <div class="analytics-grid" id="analytics-grid">
+            <div class="analytic-cell">
+                <div class="analytic-label">Emails Sent</div>
+                <div class="analytic-value up" id="a-sent">—</div>
+                <div class="analytic-sub" id="a-sent-sub">all time</div>
+                <div class="analytic-bar-wrap"><div class="analytic-bar" id="a-sent-bar" style="width:0%;background:var(--green);"></div></div>
+            </div>
+            <div class="analytic-cell">
+                <div class="analytic-label">This Week</div>
+                <div class="analytic-value mid" id="a-week">—</div>
+                <div class="analytic-sub">emails sent (7 days)</div>
+                <div class="analytic-bar-wrap"><div class="analytic-bar" id="a-week-bar" style="width:0%;background:var(--accent2);"></div></div>
+            </div>
+            <div class="analytic-cell">
+                <div class="analytic-label">Brokerages Contacted</div>
+                <div class="analytic-value" id="a-contacted">—</div>
+                <div class="analytic-sub" id="a-contacted-sub">unique recipients</div>
+                <div class="analytic-bar-wrap"><div class="analytic-bar" id="a-contacted-bar" style="width:0%;background:var(--accent);"></div></div>
+            </div>
+            <div class="analytic-cell">
+                <div class="analytic-label">Blog Posts</div>
+                <div class="analytic-value mid" id="a-blogs">—</div>
+                <div class="analytic-sub" id="a-blogs-sub">all time published</div>
+                <div class="analytic-bar-wrap"><div class="analytic-bar" id="a-blogs-bar" style="width:0%;background:var(--accent2);"></div></div>
+            </div>
+            <div class="analytic-cell">
+                <div class="analytic-label">LinkedIn Posts</div>
+                <div class="analytic-value" id="a-linkedin">—</div>
+                <div class="analytic-sub">auto-posted</div>
+                <div class="analytic-bar-wrap"><div class="analytic-bar" id="a-linkedin-bar" style="width:0%;background:#0a66c2;"></div></div>
+            </div>
+            <div class="analytic-cell">
+                <div class="analytic-label">Subscribers</div>
+                <div class="analytic-value up" id="a-subs">—</div>
+                <div class="analytic-sub">blog list</div>
+                <div class="analytic-bar-wrap"><div class="analytic-bar" id="a-subs-bar" style="width:0%;background:var(--green);"></div></div>
+            </div>
+        </div>
+
+        <!-- Overview stats row -->
+        <div class="section-header" style="margin-top:0;">
+            <div class="section-title">Overview</div>
         </div>
         <div class="stats-grid" id="stats-grid">
             <div class="stat-card"><div class="stat-label">Emails Sent</div><div class="stat-value accent" id="s-sent">—</div><div class="stat-sub">all time</div></div>
@@ -837,11 +906,44 @@
         // CSV stats from trigger server
         if (localRes.status === 'fulfilled' && localRes.value.ok) {
             const d = await localRes.value.json();
+
+            // Overview row
             document.getElementById('s-sent').textContent      = d.emails_sent;
             document.getElementById('s-blogs').textContent     = d.blogs_published;
             document.getElementById('s-subs').textContent      = d.subscribers;
             document.getElementById('s-next-out').textContent  = d.next_outreach;
             document.getElementById('s-next-blog').textContent = d.next_blog_gen;
+
+            // Analytics panel
+            const totalBrokerages = d.brokerages || 1;
+            const dailyLimit = 20;
+
+            // Emails sent
+            document.getElementById('a-sent').textContent = d.emails_sent ?? '—';
+            document.getElementById('a-sent-sub').textContent = `${d.emails_failed ?? 0} failed`;
+            document.getElementById('a-sent-bar').style.width = Math.min((d.emails_sent / Math.max(totalBrokerages, 1)) * 100, 100) + '%';
+
+            // This week
+            document.getElementById('a-week').textContent = d.emails_this_week ?? '—';
+            document.getElementById('a-week-bar').style.width = Math.min((d.emails_this_week / dailyLimit) * 100, 100) + '%';
+
+            // Brokerages contacted
+            document.getElementById('a-contacted').textContent = d.brokerages_contacted ?? '—';
+            document.getElementById('a-contacted-sub').textContent = `of ${totalBrokerages} in list`;
+            document.getElementById('a-contacted-bar').style.width = Math.min(((d.brokerages_contacted ?? 0) / Math.max(totalBrokerages, 1)) * 100, 100) + '%';
+
+            // Blogs
+            document.getElementById('a-blogs').textContent = d.blogs_published ?? '—';
+            document.getElementById('a-blogs-sub').textContent = `${d.blogs_this_month ?? 0} this month`;
+            document.getElementById('a-blogs-bar').style.width = Math.min((d.blogs_published / 12) * 100, 100) + '%';
+
+            // LinkedIn
+            document.getElementById('a-linkedin').textContent = d.linkedin_posts ?? '—';
+            document.getElementById('a-linkedin-bar').style.width = Math.min(((d.linkedin_posts ?? 0) / Math.max(d.blogs_published, 1)) * 100, 100) + '%';
+
+            // Subscribers
+            document.getElementById('a-subs').textContent = d.subscribers ?? '—';
+            document.getElementById('a-subs-bar').style.width = Math.min((d.subscribers / 100) * 100, 100) + '%';
 
             const tbody = document.getElementById('jobs-tbody');
             const empty = document.getElementById('jobs-empty');
