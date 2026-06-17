@@ -1036,16 +1036,42 @@
         <div class="container">
             <h2>Your marketing is already late.<br>Let's fix that today.</h2>
             <p>Book a 20-minute demo. We'll show you a live campaign and set up your first one free.</p>
-            <form style="display:flex;gap:12px;max-width:460px;margin:0 auto;" onsubmit="handleSignup(event)">
+            <form style="display:flex;flex-direction:column;gap:12px;max-width:520px;margin:0 auto;" onsubmit="handleSignup(event)">
+                <input
+                    type="text"
+                    id="signup-name"
+                    placeholder="Your Name"
+                    required
+                    style="padding:14px 18px;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;font-size:1rem;outline:none;"
+                >
                 <input
                     type="email"
                     id="signup-email"
                     placeholder="your@email.com"
                     required
-                    style="flex:1;padding:14px 18px;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;font-size:1rem;outline:none;"
+                    style="padding:14px 18px;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;font-size:1rem;outline:none;"
                 >
+                <input
+                    type="text"
+                    id="signup-company"
+                    placeholder="Brokerage Name (optional)"
+                    style="padding:14px 18px;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;font-size:1rem;outline:none;"
+                >
+                <select
+                    id="signup-lead-source"
+                    required
+                    style="padding:14px 18px;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;font-size:1rem;outline:none;appearance:none;background-image:url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27white%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e');background-repeat:no-repeat;background-position:right 12px center;background-size:20px;padding-right:40px;"
+                >
+                    <option value="" disabled selected>How did you hear about us?</option>
+                    <option value="cold_email">Cold Email</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="blog">Blog Post</option>
+                    <option value="google">Google Search</option>
+                    <option value="referral">Referral</option>
+                    <option value="other">Other</option>
+                </select>
                 <button type="submit" class="btn-os-primary" style="white-space:nowrap;padding:14px 24px;">
-                    Get Access
+                    Book Demo
                 </button>
             </form>
             <div id="signup-success" style="display:none;margin-top:20px;color:#10b981;font-size:1rem;font-weight:600;">
@@ -1143,7 +1169,11 @@
         // Early access signup — sends to Resend via backend
         async function handleSignup(e) {
             e.preventDefault();
+            const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
+            const company = document.getElementById('signup-company').value || '';
+            const leadSource = document.getElementById('signup-lead-source').value;
+
             const btn = e.target.querySelector('button');
             btn.textContent = 'Sending...';
             btn.disabled = true;
@@ -1152,7 +1182,13 @@
                 const res = await fetch('https://digicards-api.fly.dev/outreachos/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        company,
+                        lead_source: leadSource,
+                        signup_type: 'demo'
+                    })
                 });
                 if (!res.ok) throw new Error('api_error');
 
@@ -1162,7 +1198,14 @@
                 // Fallback: save locally so no signup is ever lost
                 const existing = JSON.parse(localStorage.getItem('outreachos_signups') || '[]');
                 if (!existing.find(s => s.email === email)) {
-                    existing.push({ email, date: new Date().toISOString() });
+                    existing.push({
+                        name,
+                        email,
+                        company,
+                        lead_source: leadSource,
+                        signup_type: 'demo',
+                        date: new Date().toISOString()
+                    });
                     localStorage.setItem('outreachos_signups', JSON.stringify(existing));
                 }
                 document.getElementById('signup-success').style.display = 'block';
