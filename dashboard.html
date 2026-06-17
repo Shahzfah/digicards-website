@@ -611,8 +611,36 @@
             </div>
         </div>
 
-        <!-- Overview stats row -->
+        <!-- Outcome Metrics (NEW) -->
         <div class="section-header" style="margin-top:0;">
+            <div class="section-title">Outcome Metrics</div>
+        </div>
+        <div class="stats-grid" id="outcome-stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Inbound Replies</div>
+                <div class="stat-value green" id="s-replies">0</div>
+                <div class="stat-sub">email responses</div>
+                <button class="btn-sm btn-accent" style="margin-top:12px;width:100%;" onclick="incrementReplies()">+ Add Reply</button>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Demo Requests</div>
+                <div class="stat-value accent" id="s-demos">—</div>
+                <div class="stat-sub">from signup form</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">General Signups</div>
+                <div class="stat-value accent2" id="s-general">—</div>
+                <div class="stat-sub">waitlist signups</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Conversion Rate</div>
+                <div class="stat-value yellow" id="s-conversion">—</div>
+                <div class="stat-sub" id="s-conversion-sub">demos / signups</div>
+            </div>
+        </div>
+
+        <!-- Overview stats row -->
+        <div class="section-header" style="margin-top:32px;">
             <div class="section-title">Overview</div>
         </div>
         <div class="stats-grid" id="stats-grid">
@@ -646,6 +674,20 @@
                     <div class="action-title">Send Blog Notification</div>
                     <div class="action-desc">Notify subscribers of latest post</div>
                 </button>
+            </div>
+        </div>
+
+        <!-- Lead Source Attribution (NEW) -->
+        <div class="panel" style="margin-bottom:32px;">
+            <div class="panel-header">
+                <div class="panel-title">Lead Source Attribution</div>
+                <span style="font-size:.8rem;color:var(--text-muted);">Where signups are coming from</span>
+            </div>
+            <div class="panel-body" style="padding:24px;">
+                <div id="lead-sources-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:16px;">
+                    <!-- Populated by JavaScript -->
+                </div>
+                <div class="empty-state" id="lead-sources-empty" style="display:none;padding:24px 0;">No signups yet with lead source data.</div>
             </div>
         </div>
 
@@ -901,6 +943,20 @@
         if (backendRes.status === 'fulfilled' && backendRes.value.ok) {
             const d = await backendRes.value.json();
             document.getElementById('s-signups').textContent = d.early_access_signups;
+
+            // Outcome metrics
+            document.getElementById('s-demos').textContent = d.demo_requests ?? 0;
+            document.getElementById('s-general').textContent = d.general_signups ?? 0;
+
+            // Conversion rate
+            const total = d.early_access_signups || 1;
+            const demos = d.demo_requests || 0;
+            const convRate = total > 0 ? Math.round((demos / total) * 100) : 0;
+            document.getElementById('s-conversion').textContent = convRate + '%';
+            document.getElementById('s-conversion-sub').textContent = `${demos} of ${total} signups`;
+
+            // Lead sources
+            renderLeadSources(d.lead_sources || {});
         }
 
         // CSV stats from trigger server
@@ -1262,11 +1318,66 @@
         }
     }
 
+    // ── Lead Source Attribution ───────────────────────────────────────────────
+    const LEAD_SOURCE_LABELS = {
+        'cold_email': { label: 'Cold Email', icon: '📧', color: '#6366f1' },
+        'linkedin': { label: 'LinkedIn', icon: '💼', color: '#0a66c2' },
+        'blog': { label: 'Blog Post', icon: '📝', color: '#10b981' },
+        'google': { label: 'Google Search', icon: '🔍', color: '#f59e0b' },
+        'referral': { label: 'Referral', icon: '🤝', color: '#ec4899' },
+        'other': { label: 'Other', icon: '❓', color: '#94a3b8' }
+    };
+
+    function renderLeadSources(sources) {
+        const grid = document.getElementById('lead-sources-grid');
+        const empty = document.getElementById('lead-sources-empty');
+
+        const entries = Object.entries(sources).filter(([_, count]) => count > 0);
+
+        if (entries.length === 0) {
+            grid.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+
+        empty.style.display = 'none';
+        const total = entries.reduce((sum, [_, count]) => sum + count, 0);
+
+        grid.innerHTML = entries.map(([source, count]) => {
+            const meta = LEAD_SOURCE_LABELS[source] || LEAD_SOURCE_LABELS['other'];
+            const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+
+            return `
+                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;text-align:center;">
+                    <div style="font-size:2rem;margin-bottom:8px;">${meta.icon}</div>
+                    <div style="font-size:1.5rem;font-weight:800;color:${meta.color};margin-bottom:4px;">${count}</div>
+                    <div style="font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:4px;">${meta.label}</div>
+                    <div style="font-size:.75rem;color:var(--text-muted);">${percentage}% of signups</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ── Replies Counter (CSV-based) ───────────────────────────────────────────
+    function loadRepliesCount() {
+        const count = parseInt(localStorage.getItem('replies_count') || '0');
+        document.getElementById('s-replies').textContent = count;
+    }
+
+    async function incrementReplies() {
+        const current = parseInt(localStorage.getItem('replies_count') || '0');
+        const newCount = current + 1;
+        localStorage.setItem('replies_count', newCount.toString());
+        document.getElementById('s-replies').textContent = newCount;
+        showToast('Reply counted! Total: ' + newCount, 'success');
+    }
+
     // ── Init ──────────────────────────────────────────────────────────────────
     if (token) {
         showApp();
     }
     initLinkedIn();
+    loadRepliesCount();
 </script>
 
 </body>
