@@ -27,6 +27,15 @@
             --radius-sm: 8px;
         }
 
+        [data-theme="light"] {
+            --bg:        #f9fafb;
+            --surface:   #ffffff;
+            --surface2:  #f3f4f6;
+            --border:    rgba(0,0,0,.08);
+            --text:      #111827;
+            --text-muted:#6b7280;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg);
@@ -561,6 +570,9 @@
         <div class="topbar-actions">
             <div class="status-dot" title="Scheduler running"></div>
             <span style="font-size:.8rem;color:var(--text-muted);">Scheduler live</span>
+            <button class="topbar-logout" onclick="toggleTheme()" style="margin-right:8px;" title="Toggle light/dark mode">
+                <span id="theme-icon">🌙</span>
+            </button>
             <button class="topbar-logout" onclick="doLogout()">Sign out</button>
         </div>
     </div>
@@ -835,10 +847,14 @@
                 <span style="font-size:.8rem;color:var(--text-muted);">Auto-post after each blog publish</span>
             </div>
             <div class="social-grid">
-                <div class="social-card" id="linkedin-card">
+                <div class="social-card" id="linkedin-card" style="grid-column:span 2;">
                     <div class="social-icon">💼</div>
                     <div class="social-name">LinkedIn</div>
                     <div class="social-status" id="linkedin-status">Not connected</div>
+                    <div id="linkedin-schedule" style="font-size:.7rem;color:var(--text-muted);margin-top:8px;line-height:1.5;display:none;">
+                        📅 Posts automatically after each blog publish (weekly on Mondays at 09:00)<br>
+                        💡 Your latest blog post will be formatted and posted to LinkedIn within 5 minutes
+                    </div>
                     <button id="linkedin-btn" onclick="connectLinkedIn()" style="margin-top:8px;padding:5px 12px;font-size:.75rem;border-radius:6px;border:1px solid #0a66c2;background:transparent;color:#0a66c2;cursor:pointer;font-weight:600;">Connect</button>
                 </div>
                 <div class="social-card">
@@ -1222,9 +1238,11 @@
     function updateLinkedInUI(connected, name) {
         const status = document.getElementById('linkedin-status');
         const btn = document.getElementById('linkedin-btn');
+        const schedule = document.getElementById('linkedin-schedule');
         if (connected) {
             status.textContent = `Connected as ${name || 'LinkedIn'}`;
             status.style.color = '#10b981';
+            schedule.style.display = 'block';
             btn.textContent = 'Disconnect';
             btn.style.borderColor = '#ef4444';
             btn.style.color = '#ef4444';
@@ -1232,6 +1250,7 @@
         } else {
             status.textContent = 'Not connected';
             status.style.color = '';
+            schedule.style.display = 'none';
             btn.textContent = 'Connect';
             btn.style.borderColor = '#0a66c2';
             btn.style.color = '#0a66c2';
@@ -1372,7 +1391,31 @@
         showToast('Reply counted! Total: ' + newCount, 'success');
     }
 
+    // ── Theme Toggle ──────────────────────────────────────────────────────────
+    function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('dashboard_theme', newTheme);
+
+        // Update icon
+        const icon = document.getElementById('theme-icon');
+        icon.textContent = newTheme === 'light' ? '☀️' : '🌙';
+    }
+
+    function initTheme() {
+        const savedTheme = localStorage.getItem('dashboard_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        const icon = document.getElementById('theme-icon');
+        if (icon) {
+            icon.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+        }
+    }
+
     // ── Init ──────────────────────────────────────────────────────────────────
+    initTheme();
     if (token) {
         showApp();
     }
