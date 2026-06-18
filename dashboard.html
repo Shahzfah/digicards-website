@@ -28,12 +28,17 @@
         }
 
         [data-theme="light"] {
-            --bg:        #f9fafb;
+            --bg:        #fafbfc;
             --surface:   #ffffff;
-            --surface2:  #f3f4f6;
-            --border:    rgba(0,0,0,.08);
-            --text:      #111827;
-            --text-muted:#6b7280;
+            --surface2:  #f6f8fa;
+            --border:    #e1e4e8;
+            --accent:    #5b51d8;
+            --accent2:   #0891b2;
+            --green:     #059669;
+            --yellow:    #d97706;
+            --red:       #dc2626;
+            --text:      #24292f;
+            --text-muted:#57606a;
         }
 
         body {
@@ -125,6 +130,11 @@
             align-items: center;
             justify-content: space-between;
         }
+        [data-theme="light"] .topbar {
+            background: rgba(255,255,255,.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 0 rgba(0,0,0,.04);
+        }
         .topbar-brand {
             display: flex;
             align-items: center;
@@ -190,6 +200,9 @@
             border-radius: var(--radius);
             padding: 24px;
         }
+        [data-theme="light"] .stat-card {
+            box-shadow: 0 1px 3px rgba(0,0,0,.04);
+        }
         .stat-label { font-size: .8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
         .stat-value { font-size: 2rem; font-weight: 800; }
         .stat-value.accent  { color: var(--accent); }
@@ -215,6 +228,9 @@
             flex-direction: column;
             gap: 6px;
         }
+        [data-theme="light"] .analytic-cell {
+            background: #ffffff;
+        }
         .analytic-label { font-size: .75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
         .analytic-value { font-size: 1.75rem; font-weight: 800; color: var(--text); }
         .analytic-value.up   { color: var(--green); }
@@ -234,6 +250,9 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             overflow: hidden;
+        }
+        [data-theme="light"] .panel {
+            box-shadow: 0 1px 3px rgba(0,0,0,.04);
         }
         .panel-header {
             padding: 20px 24px 16px;
