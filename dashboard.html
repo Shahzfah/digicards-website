@@ -642,17 +642,11 @@
             </div>
         </div>
 
-        <!-- Outcome Metrics (NEW) -->
+        <!-- Outcome Metrics -->
         <div class="section-header" style="margin-top:0;">
             <div class="section-title">Outcome Metrics</div>
         </div>
         <div class="stats-grid" id="outcome-stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Inbound Replies</div>
-                <div class="stat-value green" id="s-replies">0</div>
-                <div class="stat-sub">email responses</div>
-                <button class="btn-sm btn-accent" style="margin-top:12px;width:100%;" onclick="incrementReplies()">+ Add Reply</button>
-            </div>
             <div class="stat-card">
                 <div class="stat-label">Demo Requests</div>
                 <div class="stat-value accent" id="s-demos">—</div>
@@ -665,7 +659,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-label">Conversion Rate</div>
-                <div class="stat-value yellow" id="s-conversion">—</div>
+                <div class="stat-value green" id="s-conversion">—</div>
                 <div class="stat-sub" id="s-conversion-sub">demos / signups</div>
             </div>
         </div>
@@ -1396,20 +1390,6 @@
         }).join('');
     }
 
-    // ── Replies Counter (CSV-based) ───────────────────────────────────────────
-    function loadRepliesCount() {
-        const count = parseInt(localStorage.getItem('replies_count') || '0');
-        document.getElementById('s-replies').textContent = count;
-    }
-
-    async function incrementReplies() {
-        const current = parseInt(localStorage.getItem('replies_count') || '0');
-        const newCount = current + 1;
-        localStorage.setItem('replies_count', newCount.toString());
-        document.getElementById('s-replies').textContent = newCount;
-        showToast('Reply counted! Total: ' + newCount, 'success');
-    }
-
     // ── Theme Toggle ──────────────────────────────────────────────────────────
     function toggleTheme() {
         const html = document.documentElement;
@@ -1439,7 +1419,6 @@
         showApp();
     }
     initLinkedIn();
-    loadRepliesCount();
 </script>
 
 </body>
