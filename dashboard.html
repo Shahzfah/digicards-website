@@ -648,6 +648,13 @@
         </div>
         <div class="stats-grid" id="outcome-stats-grid">
             <div class="stat-card">
+                <div class="stat-label">Inbound Replies</div>
+                <div class="stat-value yellow" id="s-replies">—</div>
+                <div class="stat-sub">
+                    <button class="btn-sm btn-ghost" onclick="incrementReplies()" style="margin-top:4px;padding:4px 10px;font-size:.75rem;">+ Add Reply</button>
+                </div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-label">Demo Requests</div>
                 <div class="stat-value accent" id="s-demos">—</div>
                 <div class="stat-sub">from signup form</div>
@@ -974,6 +981,7 @@
             document.getElementById('s-signups').textContent = d.early_access_signups;
 
             // Outcome metrics
+            document.getElementById('s-replies').textContent = d.inbound_replies ?? 0;
             document.getElementById('s-demos').textContent = d.demo_requests ?? 0;
             document.getElementById('s-general').textContent = d.general_signups ?? 0;
 
@@ -1182,6 +1190,26 @@
                     'Note: Quick Actions only work when accessing the dashboard locally.'
                 ]
             });
+        }
+    }
+
+    // ── Increment Replies Counter ─────────────────────────────────────────────
+    async function incrementReplies() {
+        try {
+            const res = await fetch(`${API}/dashboard/metrics/inbound_replies/increment`, {
+                method: 'POST',
+                headers: headers()
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('s-replies').textContent = data.metric_value;
+                showToast('Reply counted!', 'success');
+            } else {
+                showToast('Error incrementing replies', 'error');
+            }
+        } catch (e) {
+            showToast('Error incrementing replies', 'error');
         }
     }
 
